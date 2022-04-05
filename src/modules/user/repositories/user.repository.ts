@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { BasicRepository } from "src/interfaces/Repository";
 import { models } from "src/services/database/sequelize";
 import { User } from "../entities/user.entity";
 
 
 @Injectable()
-export class UserRepository implements BasicRepository<User> {
+export class UserRepository {
 
 	async getById(id: number): Promise<User> {		
 

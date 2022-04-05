@@ -27,6 +27,10 @@ export class CookbookService {
 
 	async updateById(id: number, cookbookData: any) {
 		const updated = await this.cookbookRepo.updateById(id, cookbookData);
+
+		if(!updated)
+			throw new Error('No such cookbook');
+
 		return updated;
 	}
 

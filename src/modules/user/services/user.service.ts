@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { UserRepository } from "../repositories/user.repository"; 
-import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -21,10 +20,6 @@ export class UserService {
 	}
 
 	async create(userData: any) {
-		
-		const salt = bcrypt.genSaltSync(10);
-		userData.password = bcrypt.hashSync(userData.password, salt);
-
 		const created = await this.userRepo.create(userData);
 		return created;
 	}

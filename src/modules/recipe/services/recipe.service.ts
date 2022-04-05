@@ -27,6 +27,10 @@ export class RecipeService {
 
 	async updateById(id: number, recipeData: any) {
 		const updated = await this.recipeRepo.updateById(id, recipeData);
+
+		if(!updated)
+			throw new Error('no such recipe');
+
 		return updated;
 	}
 

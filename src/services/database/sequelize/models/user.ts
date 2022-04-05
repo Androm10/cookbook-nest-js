@@ -1,5 +1,6 @@
 import {  DataTypes } from 'sequelize';
 import { sequelize } from '../sequelize';
+import * as bcrypt from 'bcrypt';
 
 export const user = sequelize.define(
     'user',
@@ -30,3 +31,16 @@ export const user = sequelize.define(
         timestamps: false
     }
 );
+
+user.addHook('beforeCreate', 'hashPassword', async (user: any, options) => {
+    console.log(bcrypt)
+    
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt); 
+});
+
+// user.beforeCreate(async (user, options) => {
+//     const hashedPassword = await crypt.cryptPassword(user.password)
+//     user.password = hashedPassword
+//   })
+

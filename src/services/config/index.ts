@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-const env = dotenv.config();
+dotenv.config();
 
 export const config = {
     database : {
@@ -9,4 +9,5 @@ export const config = {
         host: process.env.DB_HOST || "localhost",
         port: +process.env.DB_PORT || 3307
     },
+    secret : process.env.SECRET || 'secret'
 }

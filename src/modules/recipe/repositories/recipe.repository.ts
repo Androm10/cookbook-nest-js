@@ -1,17 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { BasicRepository } from "src/interfaces/Repository";
 import { models } from "src/services/database/sequelize";
 import { Recipe } from "../entities/recipe.entity";
 
 
 @Injectable()
-export class RecipeRepository implements BasicRepository<Recipe> {
+export class RecipeRepository {
 
 	async getById(id: number): Promise<Recipe> {		
         const found = await models.recipe.findByPk(id);
-
+        
         if(!found)
-            throw new Error('No such recipe');
+            return null;
 
         return new Recipe(found);
   	}
@@ -33,6 +32,10 @@ export class RecipeRepository implements BasicRepository<Recipe> {
     async updateById(id: number, recipeData: any): Promise<Recipe> {
         
         const recipe = await models.recipe.findByPk(id);
+
+        if(!recipe)
+            return null;
+
         await recipe.update(recipeData);
 
         return new Recipe(recipe);
