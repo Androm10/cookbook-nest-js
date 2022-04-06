@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CookbookRepository } from "../repositories/cookbook.repository"; 
 
 @Injectable()
@@ -43,4 +43,34 @@ export class CookbookService {
 		return deleted;
 	}
 
+	async linkRecipe(id: number, recipeId: number) {
+		const cookbook = await this.cookbookRepo.getById(id);
+
+		if(!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+
+		const link = await this.cookbookRepo.linkRecipe(id, recipeId);
+
+		if(!link) {
+			throw new Error('Cannot add this recipe'); 
+		}
+		return link;
+	}
+
+	async unlinkRecipe(id: number, recipeId: number) {
+		const cookbook = await this.cookbookRepo.getById(id);
+
+		if(!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+
+		const link = await this.cookbookRepo.unlinkRecipe(id, recipeId);
+
+		if(!link) {
+			throw new BadRequestException('Cannot unlink this recipe'); 
+		}
+
+		return link;
+	}
 }

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserRepository } from "../repositories/user.repository"; 
 
 @Injectable()
@@ -36,6 +36,35 @@ export class UserService {
 			throw new Error('Cannot delete user');
 
 		return deleted;
+	}
+
+	async getByLogin(login: string) {
+		const user = await this.userRepo.getByLogin(login);
+
+		return user;
+	}
+
+	async registerUser(userData: any) {
+		const user = await this.userRepo.registerUser(userData);
+
+		return user;
+	} 
+
+	async updateProfile(userId: number, userInfo: any) {
+
+		if(!await this.userRepo.getById(userId))
+			throw new BadRequestException('No such user');
+
+		const updated = await this.userRepo.updateProfile(userId, userInfo);
+		return updated;
+	}
+
+	async getRoles(userId: number): Promise<any[]> {
+
+		if(!await this.userRepo.getById(userId))
+			throw new BadRequestException('No such user');
+
+		return await this.userRepo.getRoles(userId);
 	}
 
 }

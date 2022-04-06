@@ -1,5 +1,6 @@
 
 interface IUser {
+    id: number,
     login: string,
     password: string,
     status: string
@@ -12,11 +13,13 @@ const StatusTypes = [
 ]
 
 export class User implements IUser {
+    id: number;
     login: string;
     status: string;
     password: string;
 
     constructor(user: any) {
+        this.id = user.id;
         this.login = user.login;
         this.password = user.password;
         this.status = user.status;

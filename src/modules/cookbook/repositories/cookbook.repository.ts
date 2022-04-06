@@ -54,5 +54,45 @@ export class CookbookRepository {
         return true;
     }
       
+    async linkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
+        
+        const recipe = await models.recipe.findByPk(recipeId);
+        
+        if(!recipe)
+            return null;
+
+        try {
+            await models.cookbooksRecipes.findOrCreate({ where: {recipeId, cookbookId}});
+            return true;
+        }
+        catch(error) {
+            return false;
+        }
+        
+    }
+
+    async unlinkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
+        
+        const recipe = await models.recipe.findByPk(recipeId);
+        
+        if(!recipe)
+            return null;
+
+        const link = await models.cookbooksRecipes.findOne({ where: { cookbookId, recipeId } });
+        
+        if(!link) {
+            return false;
+        }
+
+        try {
+            await link.destroy();
+            return true;
+        }
+        catch(error) {
+            return false;
+        }
+
+    }
+
 
 }

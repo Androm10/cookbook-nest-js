@@ -1,5 +1,6 @@
 
 interface ICookbook {
+    id: number,
     creatorId: number,
     name: string,
     avatar: string,
@@ -8,12 +9,14 @@ interface ICookbook {
 
 
 export class Cookbook implements ICookbook {
+    id: number;
     creatorId: number;
     name: string;
     avatar: string;
     description: string
 
     constructor(cookbook: any) {
+        this.id = cookbook.id;
         this.creatorId = cookbook.creatorId;
         this.name = cookbook.name;
         this.avatar = cookbook.avatar;

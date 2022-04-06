@@ -49,6 +49,44 @@ export class UserRepository {
         }
         return true;
     }
+
+    async getByLogin(login: string): Promise<User> {
+        
+        const user = await models.user.findOne({ where: { login } });
+
+        if(!user)
+            return null;
+        
+        return new User(user);
+    } 
+    
+    async registerUser(userData: any): Promise<User> {
+
+        const user: any = await models.user.create({ login: userData.login, 
+            password: userData.password, 
+            status: userData.status
+        });
+
+        const userRole = await models.role.findOne({ where: { name: "User" } });
+        
+        await Promise.all([
+            user.addRole(userRole),
+            user.createUserInfo({username: userData.username})
+        ]);
+
+        return new User(user);
+    }
       
+    async updateProfile(userId: number, userInfo: any) {
+
+        const user = await models.userInfo.findOne({ where: { userId } });
+        return await user.update(userInfo);
+    }
+
+    async getRoles(userId: number) {
+
+        const user: any = await models.user.findByPk(userId);
+        return await user.getRoles();
+    }
 
 }

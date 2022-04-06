@@ -1,5 +1,6 @@
 
 interface IRecipe {
+    id: number,
     creatorId: number,
     name: string,
     avatar: string,
@@ -11,6 +12,7 @@ interface IRecipe {
 
 
 export class Recipe implements IRecipe {
+    id: number;
     creatorId: number;
     name: string;
     avatar: string;
@@ -20,6 +22,7 @@ export class Recipe implements IRecipe {
     cookingTime: number;
 
     constructor(recipe: any) {
+        this.id = recipe.id;
         this.creatorId = recipe.creatorId;
         this.name = recipe.name;
         this.avatar = recipe.avatar;

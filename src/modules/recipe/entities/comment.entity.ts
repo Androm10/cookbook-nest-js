@@ -1,4 +1,5 @@
 interface IComment {
+    id: number,
     userId: number,
     recipeId: number,
     text: string,
@@ -8,18 +9,20 @@ interface IComment {
 
 
 export class Comment implements IComment {
+    id: number
     userId: number
     recipeId: number
     text: string
     rate: number
     createdAt: number
 
-    constructor(recipe: any) {
-        this.userId = recipe.userId;
-        this.recipeId = recipe.recipeId;
-        this.text = recipe.text;
-        this.rate = recipe.rate;
-        this.createdAt = recipe.createdAt;
+    constructor(comment: any) {
+        this.id = comment.id;
+        this.userId = comment.userId;
+        this.recipeId = comment.recipeId;
+        this.text = comment.text;
+        this.rate = comment.rate;
+        this.createdAt = comment.createdAt;
         this.validate();
     }
 
