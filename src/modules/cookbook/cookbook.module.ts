@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
 import { CommentController } from './controllers/comment.controller';
 import { CookbookController } from './controllers/cookbook.controller';
 import { LikeController } from './controllers/like.controller';
@@ -10,9 +11,11 @@ import { CookbookService } from './services/cookbook.service';
 import { LikeService } from './services/like.service';
 
 @Module({
+	imports: [],
 	controllers: [CookbookController, LikeController, CommentController],
 	providers: [CookbookService, CookbookRepository, 
 				LikeService, LikeRepository, 
-				CommentService, CommentRepository]
+				CommentService, CommentRepository,
+				CheckRoles]
 })
 export class CookbookModule {}

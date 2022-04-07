@@ -18,21 +18,21 @@ export class RecipeController {
         return this.recipeService.getAll();
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     async create(@Req() req, @Body() createRecipeDto: CreateRecipeDto) {
         
         return this.recipeService.create({creatorId: req.user.id, ...createRecipeDto});
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Put(':id')
+    @UseGuards(AuthGuard('jwt'))
     async updateById(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
         return this.recipeService.updateById(+id, updateRecipeDto);
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
+    @UseGuards(AuthGuard('jwt'))
     async deleteById(@Param('id') id: string) {
         return this.recipeService.deleteById(+id);
     }

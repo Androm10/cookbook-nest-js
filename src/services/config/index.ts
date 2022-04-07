@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
+import * as path from 'path';
+const conf = dotenv.config({ path: path.resolve(`${process.env.NODE_ENVIRONMENT}.env`) });
 
-export const config = {
+export default () => ({
     database : {
         name: process.env.DB_NAME || "cookbook",
         user: process.env.DB_USER || "root",
@@ -10,4 +11,4 @@ export const config = {
         port: +process.env.DB_PORT || 3307
     },
     secret : process.env.SECRET || 'secret'
-}
+});

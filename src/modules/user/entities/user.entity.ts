@@ -6,7 +6,7 @@ interface IUser {
     status: string
 }
 
-const StatusTypes = [
+export const StatusTypes = [
     "active",
     "block",
     "delete"

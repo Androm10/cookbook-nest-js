@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { LikeRepository } from '../repositories/like.repository';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class LikeService {
 		const created = await this.likeRepository.like(id, userId);
 		
 		if(!created)
-			throw new Error('Already have like on this recipe');
+			throw new BadRequestException('Already have like on this recipe');
 
 		return created;
   	}
@@ -19,7 +19,7 @@ export class LikeService {
 		const deleted = await this.likeRepository.unlike(id, userId);
 		
 		if(!deleted)
-			throw new Error('This recipe does not have like');
+			throw new BadRequestException('This recipe does not have like');
 
 		return deleted;
 	}

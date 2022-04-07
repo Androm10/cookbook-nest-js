@@ -18,8 +18,8 @@ export class CommentController {
         return this.commentService.getAll(+recipeId);
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Post('/:recipeId')
+    @UseGuards(AuthGuard('jwt'))
     async create(@Param('recipeId') recipeId: string, @Body() createCommentDto: CreateCommentDto, @Req() req: any) {
         const comment = {
             text: createCommentDto.text,
@@ -32,14 +32,14 @@ export class CommentController {
         return this.commentService.create(comment);
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Put(':id')
+    @UseGuards(AuthGuard('jwt'))
     async updateById(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto, @Req() req: any) {
         return this.commentService.updateById(+id, req.user.id, updateCommentDto);
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
+    @UseGuards(AuthGuard('jwt'))
     async deleteById(@Param('id') id: string, @Req() req: any) {
         return this.commentService.deleteById(+id, req.user.id);
     }

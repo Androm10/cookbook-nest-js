@@ -1,5 +1,7 @@
 import { Sequelize } from 'sequelize';
-import { config } from 'src/services/config';
+import loadConfig from 'src/services/config';
+
+const config = loadConfig();
 
 const sequelize = new Sequelize(
     config.database.name,

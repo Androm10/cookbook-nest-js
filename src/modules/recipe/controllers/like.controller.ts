@@ -6,14 +6,14 @@ import { LikeService } from '../services/like.service';
 export class LikeController {
     constructor(private readonly likeService: LikeService) {}
 
-    @UseGuards(AuthGuard('jwt'))
     @Get(':id')
+    @UseGuards(AuthGuard('jwt'))
     async like(@Param('id') id: string, @Req() req) {
         return this.likeService.like(+id, req.user.id);
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
+    @UseGuards(AuthGuard('jwt'))
     async unlike(@Param('id') id: string, @Req() req) {
         return this.likeService.unlike(+id, req.user.id);
     }

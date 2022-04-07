@@ -11,7 +11,7 @@ export class UserRepository {
         const found = await models.user.findByPk(id);
 
         if(!found)
-            throw new Error('No such user');
+            return null;
 
         return new User(found);
   	}
@@ -33,6 +33,10 @@ export class UserRepository {
     async updateById(id: number, userData: any): Promise<User> {
         
         const user = await models.user.findByPk(id);
+
+        if(!user)
+            return null;
+
         await user.update(userData);
 
         return new User(user);

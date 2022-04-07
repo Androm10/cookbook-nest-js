@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { UserRepository } from "../repositories/user.repository"; 
 
 @Injectable()
@@ -9,7 +9,7 @@ export class UserService {
 		const user = await this.userRepo.getById(id);
 		
 		if(!user)
-			throw new Error('No such user');
+			throw new NotFoundException('No such user');
 
 		return user;
   	}
@@ -26,6 +26,10 @@ export class UserService {
 
 	async updateById(id: number, userData: any) {
 		const updated = await this.userRepo.updateById(id, userData);
+
+		if(!updated)
+			throw new NotFoundException('No such user');
+
 		return updated;
 	}
 
@@ -33,14 +37,13 @@ export class UserService {
 		const deleted = await this.userRepo.deleteById(id);
 		
 		if(!deleted)
-			throw new Error('Cannot delete user');
+			throw new NotFoundException('Cannot delete user');
 
 		return deleted;
 	}
 
 	async getByLogin(login: string) {
 		const user = await this.userRepo.getByLogin(login);
-
 		return user;
 	}
 
@@ -53,7 +56,7 @@ export class UserService {
 	async updateProfile(userId: number, userInfo: any) {
 
 		if(!await this.userRepo.getById(userId))
-			throw new BadRequestException('No such user');
+			throw new NotFoundException('No such user');
 
 		const updated = await this.userRepo.updateProfile(userId, userInfo);
 		return updated;
@@ -62,7 +65,7 @@ export class UserService {
 	async getRoles(userId: number): Promise<any[]> {
 
 		if(!await this.userRepo.getById(userId))
-			throw new BadRequestException('No such user');
+			throw new NotFoundException('No such user');
 
 		return await this.userRepo.getRoles(userId);
 	}

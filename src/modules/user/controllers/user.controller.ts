@@ -4,7 +4,8 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { UserService } from '../services/user.service';
-import { isAdmin } from 'src/middlewares/isAdmin/Guard';
+import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
+import { Roles } from 'src/middlewares/CheckRoles/Decorator';
 
 @Controller('user')
 export class UserController {
@@ -27,25 +28,25 @@ export class UserController {
     }
     
     //admin
-    @UseGuards(AuthGuard('jwt'))
-    @UseGuards(isAdmin)
     @Post()
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
     async create(@Body() createUserDto: CreateUserDto) {
         return this.userService.create(createUserDto);
     }
 
     //admin
-    @UseGuards(AuthGuard('jwt'))
-    @UseGuards(isAdmin)
     @Put(':id')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
     async updateById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
         return this.userService.updateById(+id, updateUserDto);
     }
 
     //admin
-    @UseGuards(AuthGuard('jwt'))
-    @UseGuards(isAdmin)
     @Delete(':id')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
     async deleteById(@Param('id') id: string) {
         return this.userService.deleteById(+id);
     }

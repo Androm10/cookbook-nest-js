@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CookbookRepository } from "../repositories/cookbook.repository"; 
 
 @Injectable()
@@ -9,7 +9,7 @@ export class CookbookService {
 		const cookbook = await this.cookbookRepo.getById(id);
 		
 		if(!cookbook)
-			throw new Error('No such cookbook');
+			throw new NotFoundException('No such cookbook');
 
 		return cookbook;
   	}
@@ -29,7 +29,7 @@ export class CookbookService {
 		const updated = await this.cookbookRepo.updateById(id, cookbookData);
 
 		if(!updated)
-			throw new Error('No such cookbook');
+			throw new NotFoundException('No such cookbook');
 
 		return updated;
 	}
@@ -38,7 +38,7 @@ export class CookbookService {
 		const deleted = await this.cookbookRepo.deleteById(id);
 		
 		if(!deleted)
-			throw new Error('Cannot delete cookbook');
+			throw new NotFoundException('Cannot delete cookbook');
 
 		return deleted;
 	}
@@ -53,7 +53,7 @@ export class CookbookService {
 		const link = await this.cookbookRepo.linkRecipe(id, recipeId);
 
 		if(!link) {
-			throw new Error('Cannot add this recipe'); 
+			throw new BadRequestException('Cannot add this recipe'); 
 		}
 		return link;
 	}

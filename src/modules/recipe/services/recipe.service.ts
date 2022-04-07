@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { RecipeRepository } from "../repositories/recipe.repository"; 
 
 @Injectable()
@@ -9,7 +9,7 @@ export class RecipeService {
 		const recipe = await this.recipeRepo.getById(id);
 		
 		if(!recipe)
-			throw new Error('No such recipe');
+			throw new NotFoundException('No such recipe');
 
 		return recipe;
   	}
@@ -29,7 +29,7 @@ export class RecipeService {
 		const updated = await this.recipeRepo.updateById(id, recipeData);
 
 		if(!updated)
-			throw new Error('no such recipe');
+			throw new NotFoundException('no such recipe');
 
 		return updated;
 	}
@@ -38,7 +38,7 @@ export class RecipeService {
 		const deleted = await this.recipeRepo.deleteById(id);
 		
 		if(!deleted)
-			throw new Error('Cannot delete recipe');
+			throw new NotFoundException('Cannot delete recipe');
 
 		return deleted;
 	}
