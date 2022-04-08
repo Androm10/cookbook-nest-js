@@ -14,9 +14,14 @@ export class RecipeService {
 		return recipe;
   	}
 
-	async getAll() {
-		const recipes = await this.recipeRepo.getAll();
-		return recipes;
+	async getAll(limit: number, page: number) {
+		const recipes = await this.recipeRepo.getAll(limit, (page - 1)*limit);
+
+		return { body : recipes.rows, 
+			count : recipes.count,
+			pages : Math.ceil(recipes.count / limit),
+			page :  page
+		};
 	}
 
 	async create(recipeData: any) {

@@ -18,7 +18,7 @@ export class CreateRecipeDto {
     @IsNotEmpty()
     ingridients: string;
     
-    @IsInt()
     @Min(0)
+    @IsInt()
     cookingTime: number;
 }

@@ -1,4 +1,4 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Patch } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Patch, Query, ParseIntPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/middlewares/CheckRoles/Decorator';
 import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
@@ -11,14 +11,13 @@ export class CookbookController {
     constructor(private readonly cookbookService: CookbookService) {}
 
     @Get(':id')
-    
     async getById(@Param('id') id: string) {
         return this.cookbookService.getById(+id);
     }
 
     @Get()
-    async getAll() {
-        return this.cookbookService.getAll();
+    async getAll(@Query('limit', ParseIntPipe) limit: number, @Query('page', ParseIntPipe) page: number) {
+        return this.cookbookService.getAll(limit, page);
     }
 
     @Post()
@@ -50,6 +49,12 @@ export class CookbookController {
     async unlinkRecipe(@Param('id') cookbookId, @Param('recipeId') recipeId) {
         return this.cookbookService.unlinkRecipe(+cookbookId, +recipeId);
     } 
+
+    @Patch(':id')
+    @UseGuards(AuthGuard('jwt'))
+    async cloneCookbook(@Param('id') id: string, @Req() req) {
+        return this.cookbookService.cloneCookbook(+id, req.user.id);
+    }
 
 
 }

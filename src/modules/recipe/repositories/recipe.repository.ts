@@ -15,12 +15,16 @@ export class RecipeRepository {
         return new Recipe(found);
   	}
 
-    async getAll(): Promise<Recipe[]> {
-
-        const found = await models.recipe.findAll();
-        return found.map(recipe => {
-            return new Recipe(recipe);
-        })
+    async getAll(limit: number, offset: number): Promise<{rows: Recipe[], count: number}> {
+        
+        const found = await models.recipe.findAndCountAll({ limit, offset });
+        
+        return {
+            rows: found.rows.map(recipe => {
+                return new Recipe(recipe);
+            }),
+            count: found.count
+        };
   	}
 
     async create(recipeData: any): Promise<Recipe> {

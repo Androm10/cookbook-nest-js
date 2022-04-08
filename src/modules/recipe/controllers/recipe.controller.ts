@@ -1,4 +1,4 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateRecipeDto } from '../dto/create-recipe.dto';
 import { UpdateRecipeDto } from '../dto/update-recipe.dto';
@@ -14,8 +14,8 @@ export class RecipeController {
     }
 
     @Get()
-    async getAll() {
-        return this.recipeService.getAll();
+    async getAll(@Query('limit', ParseIntPipe) limit: number, @Query('page', ParseIntPipe) page: number) {
+        return this.recipeService.getAll(limit, page);
     }
 
     @Post()

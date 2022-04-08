@@ -1,8 +1,9 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { UserService } from '../services/user.service';
 import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
 import { Roles } from 'src/middlewares/CheckRoles/Decorator';
@@ -15,10 +16,10 @@ export class UserController {
     async getById(@Param('id') id: string) {
         return this.userService.getById(+id);
     }
-
+    
     @Get()
-    async getAll() {
-        return this.userService.getAll();
+    async getAll(@Query('limit', ParseIntPipe) limit: number, @Query('page', ParseIntPipe) page: number) {
+        return this.userService.getAll(limit, page);
     }
     
     @UseGuards(AuthGuard('jwt'))
@@ -27,6 +28,12 @@ export class UserController {
         return this.userService.updateProfile(req.user.id, updateProfileDto);
     }
     
+    @UseGuards(AuthGuard('jwt'))
+    @Put('changePassword')
+    async changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() req) {
+        return this.userService.changePassword(changePasswordDto, req.user.id);
+    }
+
     //admin
     @Post()
     @UseGuards(AuthGuard('jwt'), CheckRoles)

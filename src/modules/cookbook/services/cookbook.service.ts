@@ -14,9 +14,14 @@ export class CookbookService {
 		return cookbook;
   	}
 
-	async getAll() {
-		const cookbooks = await this.cookbookRepo.getAll();
-		return cookbooks;
+	async getAll(limit: number, page: number) {
+		const cookbooks = await this.cookbookRepo.getAll(limit, (page - 1)*limit);
+
+		return {body : cookbooks.rows, 
+			count : cookbooks.count,
+			pages : Math.ceil(cookbooks.count / limit),
+			page :  page
+		};
 	}
 
 	async create(cookbookData: any) {
@@ -73,4 +78,14 @@ export class CookbookService {
 
 		return link;
 	}
+
+	async cloneCookbook(id: number, userId: number) {
+		const cookbook = await this.cookbookRepo.getById(id);
+
+		if(!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+		return await this.cookbookRepo.cloneCookbook(id, userId);
+	}
+
 }

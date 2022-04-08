@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { UserRepository } from "../repositories/user.repository"; 
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -14,9 +15,15 @@ export class UserService {
 		return user;
   	}
 
-	async getAll() {
-		const users = await this.userRepo.getAll();
-		return users;
+	async getAll(limit: number, page: number) {
+		
+		const users = await this.userRepo.getAll(limit, (page - 1)*limit);
+
+		return { body : users.rows, 
+			count : users.count,
+			pages : Math.ceil(users.count / limit),
+			page :  page
+		};
 	}
 
 	async create(userData: any) {
@@ -68,6 +75,21 @@ export class UserService {
 			throw new NotFoundException('No such user');
 
 		return await this.userRepo.getRoles(userId);
+	}
+
+	async changePassword(passwords: any, userId: number) {
+		
+		const user: any = await this.userRepo.getById(userId);
+
+		if(!bcrypt.compareSync(passwords.oldPassword, user.password)) {
+			throw new BadRequestException('Incorrect password');
+		}
+
+		if(passwords.newPassword !== passwords.newPasswordConfirm) {
+			throw new BadRequestException('Password does not matches');
+		}
+		
+		return await this.userRepo.updateById(userId, { password: passwords.newPassword });
 	}
 
 }

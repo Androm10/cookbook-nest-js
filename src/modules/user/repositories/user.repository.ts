@@ -16,12 +16,15 @@ export class UserRepository {
         return new User(found);
   	}
 
-    async getAll(): Promise<User[]> {
+    async getAll(limit: number, offset: number): Promise<{rows: User[], count: number}> {
 
-        const found = await models.user.findAll();
-        return found.map(user => {
-            return new User(user);
-        })
+        const found = await models.user.findAndCountAll({ limit, offset});
+        return {
+            rows: found.rows.map(user => {
+                return new User(user);
+            }),
+            count: found.count
+        };
   	}
 
     async create(userData: any): Promise<User> {

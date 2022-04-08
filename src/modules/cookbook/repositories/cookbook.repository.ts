@@ -16,12 +16,15 @@ export class CookbookRepository {
         return new Cookbook(found);
   	}
 
-    async getAll(): Promise<Cookbook[]> {
+    async getAll(limit: number, offset: number): Promise<{rows: Cookbook[], count: number}> {
 
-        const found = await models.cookbook.findAll();
-        return found.map(cookbook => {
-            return new Cookbook(cookbook);
-        })
+        const found = await models.cookbook.findAndCountAll({limit, offset});
+        return {
+            rows: found.rows.map(cookbook => {
+                return new Cookbook(cookbook);
+            }),
+            count: found.count
+        };
   	}
 
     async create(cookbookData: any): Promise<Cookbook> {
@@ -94,5 +97,34 @@ export class CookbookRepository {
 
     }
 
+    async cloneCookbook(id: number, userId: number): Promise<Cookbook> {
+        
+        const cookbook: any = await models.cookbook.findByPk(id);       
+        const recipes: any[] = await cookbook.getRecipes();
+
+        const clonedCookbook: any = await models.cookbook.create({
+            name: cookbook.name,
+            description: cookbook.description,
+            creatorId: userId
+        });
+
+        let createdRecipes: any[] = recipes.map((recipe) => {
+            return {
+                name: recipe.name,
+                description: recipe.description,
+                directions: recipe.directions,
+                ingridients: recipe.ingridients,
+                cookingTime: recipe.cookingTime,
+                avatar: recipe.avatar,
+                creatorId: userId
+            };
+        });
+
+        createdRecipes = await models.recipe.bulkCreate(createdRecipes);
+
+        await clonedCookbook.addRecipes(createdRecipes);
+
+        return new Cookbook(clonedCookbook);
+    }
 
 }

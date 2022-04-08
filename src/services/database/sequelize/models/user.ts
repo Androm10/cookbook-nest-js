@@ -32,13 +32,16 @@ export const user = sequelize.define(
     }
 );
 
-user.addHook('beforeCreate', 'hashPassword', async (user: any, options) => {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt); 
-});
+async function hashPassword(user: any, options: any) {
+    if(user.password.length <= 30) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    } 
+}
 
-// user.beforeCreate(async (user, options) => {
-//     const hashedPassword = await crypt.cryptPassword(user.password)
-//     user.password = hashedPassword
-//   })
+user.addHook('beforeCreate', 'hashPassword', hashPassword);
+
+user.addHook('beforeUpdate', 'hashPassword', hashPassword);
+
+
 
