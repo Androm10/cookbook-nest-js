@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
+import { ICookbookRepository } from "src/interfaces/repositories/ICookbookRepository";
 import { models } from "src/services/database/sequelize";
 import { Cookbook } from "../entities/cookbook.entity";
 
 
 @Injectable()
-export class CookbookRepository {
+export class CookbookRepository implements ICookbookRepository<Cookbook> {
 
 	async getById(id: number): Promise<Cookbook> {		
 
@@ -125,6 +126,48 @@ export class CookbookRepository {
         await clonedCookbook.addRecipes(createdRecipes);
 
         return new Cookbook(clonedCookbook);
+    }
+
+    async countAll() {
+        const fn = models.cookbook.sequelize.fn;
+        const col = models.cookbook.sequelize.col;
+
+        const count = await models.cookbook.findAll({
+            attributes : [[fn('COUNT', col('id')), 'cookbooks']]
+        })
+        return count[0];
+    }
+
+    async getViews(id: number) {
+        const fn = models.cookbook.sequelize.fn;
+        const col = models.cookbook.sequelize.col;
+
+        const views = await models.cookbookView.findAll({
+            attributes: [[fn('COUNT', col('id')), 'views'] ],
+            where : {
+                cookbookId : id
+            }
+        });
+        return views[0];
+    }
+
+    async mostPopular() {
+        const fn = models.cookbook.sequelize.fn;
+        const col = models.cookbook.sequelize.col;
+        const literal = models.cookbook.sequelize.literal;
+
+        const cookbook = await models.cookbook.findAll({
+            include : {
+                model : models.cookbookView,
+                attributes: [[fn('COUNT', col('cookbookViews.id')), 'count']],
+                required : true
+            },
+            group: 'cookbook.id',
+            order: literal('"cookbookViews.count" DESC'),
+            limit: 1
+        })
+        
+        return cookbook[0];
     }
 
 }

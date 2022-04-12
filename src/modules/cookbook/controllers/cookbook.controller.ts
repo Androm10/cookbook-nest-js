@@ -11,8 +11,8 @@ export class CookbookController {
     constructor(private readonly cookbookService: CookbookService) {}
 
     @Get(':id')
-    async getById(@Param('id') id: string) {
-        return this.cookbookService.getById(+id);
+    async getById(@Param('id', ParseIntPipe) id: number) {
+        return this.cookbookService.getById(id);
     }
 
     @Get()
@@ -28,33 +28,53 @@ export class CookbookController {
 
     @Put(':id')
     @UseGuards(AuthGuard('jwt'))
-    async updateById(@Param('id') id: string, @Body() updateCookbookDto: UpdateCookbookDto) {
-        return this.cookbookService.updateById(+id, updateCookbookDto);
+    async updateById(@Param('id', ParseIntPipe) id: number, @Body() updateCookbookDto: UpdateCookbookDto) {
+        return this.cookbookService.updateById(id, updateCookbookDto);
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard('jwt'))
-    async deleteById(@Param('id') id: string) {
-        return this.cookbookService.deleteById(+id);
+    async deleteById(@Param('id', ParseIntPipe) id: number) {
+        return this.cookbookService.deleteById(id);
     }
 
     @Patch(':id/linkRecipe/:recipeId')
     @UseGuards(AuthGuard('jwt'))
-    async linkRecipe(@Param('id') cookbookId, @Param('recipeId') recipeId) {
-        return this.cookbookService.linkRecipe(+cookbookId, +recipeId);
+    async linkRecipe(@Param('id', ParseIntPipe) cookbookId: number, @Param('recipeId', ParseIntPipe) recipeId: number) {
+        return this.cookbookService.linkRecipe(cookbookId, recipeId);
     } 
 
     @Patch(':id/unlinkRecipe/:recipeId')
     @UseGuards(AuthGuard('jwt'))
-    async unlinkRecipe(@Param('id') cookbookId, @Param('recipeId') recipeId) {
-        return this.cookbookService.unlinkRecipe(+cookbookId, +recipeId);
+    async unlinkRecipe(@Param('id', ParseIntPipe) cookbookId: number, @Param('recipeId', ParseIntPipe) recipeId: number) {
+        return this.cookbookService.unlinkRecipe(cookbookId, recipeId);
     } 
-
+    
     @Patch(':id')
     @UseGuards(AuthGuard('jwt'))
-    async cloneCookbook(@Param('id') id: string, @Req() req) {
-        return this.cookbookService.cloneCookbook(+id, req.user.id);
+    async cloneCookbook(@Param('id', ParseIntPipe) id: number, @Req() req) {
+        return this.cookbookService.cloneCookbook(id, req.user.id);
+    }
+    
+    @Get('stats/count')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async countAll() {
+        return this.cookbookService.countAll();
+    }   
+    
+    @Get('stats/:id/views')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async getViews(@Param('id') id: number) {
+        return this.cookbookService.getViews(id);
     }
 
+    @Get('stats/mostPopular')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async mostPopular() {
+        return this.cookbookService.mostPopular();
+    }
 
 }

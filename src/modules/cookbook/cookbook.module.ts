@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { COMMENT_REPOSITORY, COOKBOOK_REPOSITORY, LIKE_REPOSITORY } from 'src/constants/repositories';
 import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
 import { CommentController } from './controllers/comment.controller';
 import { CookbookController } from './controllers/cookbook.controller';
@@ -13,9 +14,9 @@ import { LikeService } from './services/like.service';
 @Module({
 	imports: [],
 	controllers: [CookbookController, LikeController, CommentController],
-	providers: [CookbookService, CookbookRepository, 
-				LikeService, LikeRepository, 
-				CommentService, CommentRepository,
+	providers: [CookbookService, { provide: COOKBOOK_REPOSITORY, useClass: CookbookRepository }, 
+				LikeService, { provide: LIKE_REPOSITORY, useClass: LikeRepository }, 
+				CommentService, { provide: COMMENT_REPOSITORY, useClass: CommentRepository },
 				CheckRoles]
 })
 export class CookbookModule {}

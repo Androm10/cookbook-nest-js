@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
+import { IRecipeRepository } from "src/interfaces/repositories/IRecipeRepository";
 import { models } from "src/services/database/sequelize";
 import { Recipe } from "../entities/recipe.entity";
 
 
 @Injectable()
-export class RecipeRepository {
+export class RecipeRepository implements IRecipeRepository<Recipe> {
 
 	async getById(id: number): Promise<Recipe> {		
         const found = await models.recipe.findByPk(id);
@@ -56,6 +57,47 @@ export class RecipeRepository {
         }
         return true;
     }
-      
+    
+    async countAll() {
+        const fn = models.recipe.sequelize.fn;
+        const col = models.recipe.sequelize.col;
+
+        const count = await models.recipe.findAll({
+            attributes : [[fn('COUNT', col('id')), 'recipes']]
+        })
+        return count[0];
+    }
+
+    async getViews(id: number) {
+        const fn = models.recipe.sequelize.fn;
+        const col = models.recipe.sequelize.col;
+
+        const views = await models.recipeView.findAll({
+            attributes: [[fn('COUNT', col('id')), 'views'] ],
+            where : {
+                recipeId : id
+            }
+        });
+        return views[0];
+    }
+
+    async mostPopular() {
+        const fn = models.recipe.sequelize.fn;
+        const col = models.recipe.sequelize.col;
+        const literal = models.recipe.sequelize.literal;
+
+        const recipe = await models.recipe.findAll({
+            include : {
+                model : models.recipeView,
+                attributes: [[fn('COUNT', col('recipeViews.id')), 'count']],
+                required : true
+            },
+            group: 'recipe.id',
+            order: literal('"recipeViews.count" DESC'),
+            limit: 1
+        })
+        
+        return recipe[0];
+    }
 
 }

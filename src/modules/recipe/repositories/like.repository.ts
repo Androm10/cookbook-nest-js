@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
+import { ILikeRepository } from "src/interfaces/repositories/ILikeRepository";
 import { models } from "src/services/database/sequelize";
 
 
 @Injectable()
-export class LikeRepository {
+export class LikeRepository implements ILikeRepository {
 
 	async like(id: number, userId: number): Promise<boolean> {
         

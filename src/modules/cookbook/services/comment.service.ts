@@ -1,9 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { CommentRepository } from "../repositories/comment.repository"; 
+import { ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { COMMENT_REPOSITORY } from "src/constants/repositories";
+import { ICommentRepository } from "../../../interfaces/repositories/ICommentRepository"; 
+import { Comment } from "../entities/comment.entity";
 
 @Injectable()
 export class CommentService {
-	constructor(private readonly commentRepository: CommentRepository) {}
+	constructor(@Inject(COMMENT_REPOSITORY) private readonly commentRepository: ICommentRepository<Comment>) {}
 
 	async getById(id: number) {
         const comment = await this.commentRepository.getById(id);
@@ -30,7 +32,7 @@ export class CommentService {
             throw new NotFoundException('no such comment');
 
         if(comment.userId != userId)
-            throw new ForbiddenException('forbidden');
+            throw new ForbiddenException('сannot update foreign comment');
 
         return await this.commentRepository.updateById(id, cookbookData);
 	}
@@ -43,7 +45,7 @@ export class CommentService {
             throw new NotFoundException('no such comment');
 
         if(comment.userId != userId)
-            throw new ForbiddenException('forbidden');
+            throw new ForbiddenException('сannot delete foreign comment');
         
         return await this.commentRepository.deleteById(id);
 	}

@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 	constructor(private authService: AuthService, private configService: ConfigService) {
 		super({
-		secretOrKey: configService.get<string>('secret'), 
+		secretOrKey: configService.get<string>('auth.secret'), 
 		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 		});
 	}
@@ -20,8 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		if(!user) {
 			throw new UnauthorizedException();
 		}
-		console.log('user generation');
-		
 		return user;
 	}
 

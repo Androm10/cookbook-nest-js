@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
+import { ICommentRepository } from "src/interfaces/repositories/ICommentRepository";
 import { models } from "src/services/database/sequelize";
 import { Comment } from "../entities/comment.entity";
 
 
 @Injectable()
-export class CommentRepository {
+export class CommentRepository implements ICommentRepository<Comment> {
 
 	async getById(id: number): Promise<Comment> {		
         const comment = await models.cookbookComment.findByPk(id);

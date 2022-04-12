@@ -1,4 +1,4 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -13,8 +13,8 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get(':id')
-    async getById(@Param('id') id: string) {
-        return this.userService.getById(+id);
+    async getById(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.getById(id);
     }
     
     @Get()
@@ -34,7 +34,6 @@ export class UserController {
         return this.userService.changePassword(changePasswordDto, req.user.id);
     }
 
-    //admin
     @Post()
     @UseGuards(AuthGuard('jwt'), CheckRoles)
     @Roles('Admin')
@@ -42,23 +41,32 @@ export class UserController {
         return this.userService.create(createUserDto);
     }
 
-    //admin
     @Put(':id')
     @UseGuards(AuthGuard('jwt'), CheckRoles)
     @Roles('Admin')
-    async updateById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-        return this.userService.updateById(+id, updateUserDto);
+    async updateById(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+        return this.userService.updateById(id, updateUserDto);
     }
 
-    //admin
     @Delete(':id')
     @UseGuards(AuthGuard('jwt'), CheckRoles)
     @Roles('Admin')
-    async deleteById(@Param('id') id: string) {
-        return this.userService.deleteById(+id);
+    async deleteById(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.deleteById(id);
     }
 
+    @Get('stats/status')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async getStatusStats() {
+        return this.userService.getStatusStats();
+    }
     
-
+    @Get('stats/mostActive')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async getMostActive() {
+        return this.userService.mostActive();
+    }
 
 }

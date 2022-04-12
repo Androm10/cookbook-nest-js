@@ -15,9 +15,9 @@ export class CheckRoles implements CanActivate {
         const user = context.switchToHttp().getRequest().user;
         
         const roles = await this.userService.getRoles(user.id);
-    
-        return roles.reduce((prev, cur) => {
-            return prev && allowedRoles.includes(cur);
+        
+        return allowedRoles.reduce((prev, cur) => {
+            return prev && roles.map((role) => role.name).includes(cur);
         }, true);
     }
 

@@ -1,5 +1,7 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe, ValidationPipe } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/middlewares/CheckRoles/Decorator';
+import { CheckRoles } from 'src/middlewares/CheckRoles/Guard';
 import { CreateRecipeDto } from '../dto/create-recipe.dto';
 import { UpdateRecipeDto } from '../dto/update-recipe.dto';
 import { RecipeService } from '../services/recipe.service';
@@ -9,8 +11,8 @@ export class RecipeController {
     constructor(private readonly recipeService: RecipeService) {}
 
     @Get(':id')
-    async getById(@Param('id') id: string) {
-        return this.recipeService.getById(+id);
+    async getById(@Param('id', ParseIntPipe) id: number) {
+        return this.recipeService.getById(id);
     }
 
     @Get()
@@ -27,15 +29,35 @@ export class RecipeController {
 
     @Put(':id')
     @UseGuards(AuthGuard('jwt'))
-    async updateById(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
-        return this.recipeService.updateById(+id, updateRecipeDto);
+    async updateById(@Param('id', ParseIntPipe) id: number, @Body() updateRecipeDto: UpdateRecipeDto) {
+        return this.recipeService.updateById(id, updateRecipeDto);
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard('jwt'))
-    async deleteById(@Param('id') id: string) {
-        return this.recipeService.deleteById(+id);
+    async deleteById(@Param('id', ParseIntPipe) id: number) {
+        return this.recipeService.deleteById(id);
     }
 
+    @Get('stats/count')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async countAll() {
+        return this.recipeService.countAll();
+    }   
+    
+    @Get('stats/:id/views')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async getViews(@Param('id', ParseIntPipe) id: number) {
+        return this.recipeService.getViews(id);
+    }
+
+    @Get('stats/mostPopular')
+    @UseGuards(AuthGuard('jwt'), CheckRoles)
+    @Roles('Admin')
+    async mostPopular() {
+        return this.recipeService.mostPopular();
+    }
 
 }

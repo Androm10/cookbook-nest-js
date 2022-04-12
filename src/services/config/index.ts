@@ -10,5 +10,8 @@ export default () => ({
         host: process.env.DB_HOST || "localhost",
         port: +process.env.DB_PORT || 3307
     },
-    secret : process.env.SECRET || 'secret'
+    auth: {
+        secret : process.env.SECRET || 'secret',
+        expiresIn : '2h'
+    }
 });

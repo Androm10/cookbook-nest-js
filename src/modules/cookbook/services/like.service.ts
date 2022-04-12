@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { LikeRepository } from '../repositories/like.repository';
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { LIKE_REPOSITORY } from "src/constants/repositories";
+import { ILikeRepository } from '../../../interfaces/repositories/ILikeRepository';
 
 @Injectable()
 export class LikeService {
-	constructor(private readonly likeRepository: LikeRepository) {}
+	constructor(@Inject(LIKE_REPOSITORY) private readonly likeRepository: ILikeRepository) {}
 
 	async like(id: number, userId: number) {
 

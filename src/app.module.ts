@@ -5,7 +5,6 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import config from './services/config';
-import { CheckRoles } from './middlewares/CheckRoles/Guard';
 
 console.log(`.${process.env.NODE_ENVIRONMENT}.env`);
 
@@ -20,7 +19,6 @@ console.log(`.${process.env.NODE_ENVIRONMENT}.env`);
 			isGlobal: true
 		})
 	],
-	providers: [CheckRoles],
 	controllers: [],
 })
 export class AppModule {}

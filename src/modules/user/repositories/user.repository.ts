@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
+import { IUserRepository } from "src/interfaces/repositories/IUserRepository";
 import { models } from "src/services/database/sequelize";
 import { User } from "../entities/user.entity";
 
 
 @Injectable()
-export class UserRepository {
+export class UserRepository implements IUserRepository<User> {
 
 	async getById(id: number): Promise<User> {		
 
@@ -94,6 +95,30 @@ export class UserRepository {
 
         const user: any = await models.user.findByPk(userId);
         return await user.getRoles();
+    }
+
+    async getStatusStats() {
+        const fn = models.user.sequelize.fn;
+
+        return await models.user.findAll({
+            attributes : ['status', [fn('COUNT', '*'), 'users']],
+            group: 'status'
+        });
+    }
+
+    async mostActive() {
+        return await models.user.sequelize.query(
+            'SELECT u.id, COUNT(cr.id) + COUNT(cc.id) as "comments", '+ 
+            'COUNT(lr.id) + COUNT(lc.id) as "likes" FROM users u ' +
+            'LEFT JOIN c_comments cc ON u.id = cc.user_id ' +
+            'LEFT JOIN r_comments cr ON u.id = cr.user_id ' +
+            'LEFT JOIN c_likes lc ON u.id = lc.user_id ' +
+            'LEFT JOIN r_likes lr ON u.id = lr.user_id ' +
+            'GROUP BY u.id ' +
+            'ORDER BY comments + likes DESC',
+            {
+                type : "SELECT"
+            });
     }
 
 }
