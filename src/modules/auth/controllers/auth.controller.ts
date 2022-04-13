@@ -1,12 +1,15 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, Req } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { LoginDto } from '../dto/login.dto';
 import { SignupDto } from '../dto/singup.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { NoAuth } from 'src/middlewares/no-auth.middleware';
 
 
+@UseGuards(ThrottlerGuard)
+@NoAuth()
 @Controller('auth')
 export class AuthController {
-
     constructor(private readonly authService: AuthService) {}
 
     @Post('/logIn')

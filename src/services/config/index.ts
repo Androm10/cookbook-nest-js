@@ -4,14 +4,19 @@ const conf = dotenv.config({ path: path.resolve(`${process.env.NODE_ENVIRONMENT}
 
 export default () => ({
     database : {
-        name: process.env.DB_NAME || "cookbook",
-        user: process.env.DB_USER || "root",
-        password: process.env.DB_PASS || "1111",
-        host: process.env.DB_HOST || "localhost",
-        port: +process.env.DB_PORT || 3307
+        name : process.env.DB_NAME || "cookbook",
+        user : process.env.DB_USER || "root",
+        password : process.env.DB_PASS || "1111",
+        host : process.env.DB_HOST || "localhost",
+        port : +process.env.DB_PORT || 3307
     },
-    auth: {
+    auth : {
         secret : process.env.SECRET || 'secret',
         expiresIn : '2h'
-    }
+    },
+    rateLimit : {
+        ttl: 60,
+        limit: 3
+    },
+    assetsDir : process.env.ASSETS_DIR || path.resolve('assets')
 });

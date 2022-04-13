@@ -7,5 +7,5 @@ sequelize.sync()
     console.log('synchronized');
 });
 
-export {models};
+export { models };
 

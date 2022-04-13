@@ -5,7 +5,7 @@ import { Cookbook } from "../entities/cookbook.entity";
 
 @Injectable()
 export class CookbookService {
-	constructor(@Inject(COOKBOOK_REPOSITORY) private readonly cookbookRepository: ICookbookRepository<Cookbook>) {}
+	constructor(@Inject(COOKBOOK_REPOSITORY) private cookbookRepository: ICookbookRepository<Cookbook>) {}
 
 	async getById(id: number) {
 		const cookbook = await this.cookbookRepository.getById(id);

@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { UserRepository } from "../repositories/user.repository"; 
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { IUserRepository } from "../../../interfaces/repositories/IUserRepository"; 
 import * as bcrypt from 'bcrypt';
+import { USER_REPOSITORY } from "src/constants/repositories";
+import { User } from "../entities/user.entity";
 
 @Injectable()
 export class UserService {
-	constructor(private readonly userRepository: UserRepository) {}
+	constructor(@Inject(USER_REPOSITORY) private userRepository: IUserRepository<User>) {}
 
 	async getById(id: number) {
 		const user = await this.userRepository.getById(id);

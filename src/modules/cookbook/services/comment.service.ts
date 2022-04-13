@@ -5,7 +5,7 @@ import { Comment } from "../entities/comment.entity";
 
 @Injectable()
 export class CommentService {
-	constructor(@Inject(COMMENT_REPOSITORY) private readonly commentRepository: ICommentRepository<Comment>) {}
+	constructor(@Inject(COMMENT_REPOSITORY) private commentRepository: ICommentRepository<Comment>) {}
 
 	async getById(id: number) {
         const comment = await this.commentRepository.getById(id);

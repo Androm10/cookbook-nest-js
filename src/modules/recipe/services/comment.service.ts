@@ -1,9 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { CommentRepository } from "../repositories/comment.repository"; 
+import { ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { COMMENT_REPOSITORY } from "src/constants/repositories";
+import { Comment } from "../entities/comment.entity";
+import { ICommentRepository } from "../../../interfaces/repositories/ICommentRepository"; 
 
 @Injectable()
 export class CommentService {
-	constructor(private readonly commentRepository: CommentRepository) {}
+	constructor(@Inject(COMMENT_REPOSITORY) private commentRepository: ICommentRepository<Comment>) {}
 
 	async getById(id: number) {
         const comment = await this.commentRepository.getById(id);

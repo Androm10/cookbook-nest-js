@@ -4,7 +4,7 @@ import { ILikeRepository } from '../../../interfaces/repositories/ILikeRepositor
 
 @Injectable()
 export class LikeService {
-	constructor(@Inject(LIKE_REPOSITORY) private readonly likeRepository: ILikeRepository) {}
+	constructor(@Inject(LIKE_REPOSITORY) private likeRepository: ILikeRepository) {}
 
 	async like(id: number, userId: number) {
 

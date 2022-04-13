@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { RecipeRepository } from "../repositories/recipe.repository"; 
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { RECIPE_REPOSITORY } from "src/constants/repositories";
+import { Recipe } from "../entities/recipe.entity";
+import { IRecipeRepository } from "../../../interfaces/repositories/IRecipeRepository"; 
 
 @Injectable()
 export class RecipeService {
-	constructor(private readonly recipeRepository: RecipeRepository) {}
+	constructor(@Inject(RECIPE_REPOSITORY) private recipeRepository: IRecipeRepository<Recipe>) {}
 
 	async getById(id: number) {
 		const recipe = await this.recipeRepository.getById(id);

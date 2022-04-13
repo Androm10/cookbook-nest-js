@@ -3,11 +3,10 @@ import { CookbookModule } from './modules/cookbook/cookbook.module';
 import { RecipeModule } from './modules/recipe/recipe.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 import config from './services/config';
-
-console.log(`.${process.env.NODE_ENVIRONMENT}.env`);
-
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
 	imports: [CookbookModule, 
@@ -17,15 +16,21 @@ console.log(`.${process.env.NODE_ENVIRONMENT}.env`);
 		ConfigModule.forRoot({
 			load: [config],
 			isGlobal: true
+		}),
+		ThrottlerModule.forRootAsync({
+			useFactory : async (configService : ConfigService) => ({
+					limit : configService.get('rateLimit.limit'),
+					ttl : configService.get('rateLimit.ttl')
+				}),
+			inject : [ConfigService]
+		}),
+		MulterModule.registerAsync({
+			useFactory : async (configService : ConfigService) => ({
+				dest : configService.get('assetsDir')
+			}),
+			inject : [ConfigService]
 		})
 	],
 	controllers: [],
 })
 export class AppModule {}
-
-
-
-// {
-// 	provide: APP_GUARD,
-// 	useClass: isAdmin,
-// }
