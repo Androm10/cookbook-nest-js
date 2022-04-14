@@ -1,8 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
 import { IUserRepository } from "../../../interfaces/repositories/IUserRepository"; 
 import * as bcrypt from 'bcrypt';
 import { USER_REPOSITORY } from "src/constants/repositories";
 import { User } from "../entities/user.entity";
+import { createReadStream } from "fs";
 
 @Injectable()
 export class UserService {
@@ -58,30 +59,55 @@ export class UserService {
 
 	async registerUser(userData: any) {
 		const user = await this.userRepository.registerUser(userData);
-
 		return user;
 	} 
 
-	async updateProfile(userId: number, userInfo: any) {
+	async updateProfile(id: number, userInfo: any) {
 
-		if(!await this.userRepository.getById(userId))
-			throw new NotFoundException('No such user');
+		if(!await this.userRepository.getById(id)) {
+			throw new BadRequestException('No such user');
+		}
 
-		const updated = await this.userRepository.updateProfile(userId, userInfo);
+		const updated = await this.userRepository.updateProfile(id, userInfo);
 		return updated;
 	}
 
-	async getRoles(userId: number): Promise<any[]> {
-
-		if(!await this.userRepository.getById(userId))
-			throw new NotFoundException('No such user');
-
-		return await this.userRepository.getRoles(userId);
+	async getProfile(id: number) {
+		if(!await this.userRepository.getById(id)) {
+			throw new BadRequestException('No such user');
+		}
+		return await this.userRepository.getProfile(id);
 	}
 
-	async changePassword(passwords: any, userId: number) {
+	async uploadAvatar(file: Express.Multer.File, id: number) {
+		if(!(await this.userRepository.getById(id))) {
+			throw new BadRequestException('No such user');
+		}
+		return await this.userRepository.updateProfile(id, { avatar : file.path });
+	}
+
+	async getAvatar(id: number) : Promise<StreamableFile> {
+		const user = await this.userRepository.getById(id);
+		if(!user) {
+			throw new BadRequestException('No such user');
+		}
+		const userInfo = await this.userRepository.getProfile(id);
+		const fileStream = createReadStream(userInfo.avatar);
+		return new StreamableFile(fileStream);
+	}
+
+	async getRoles(id: number): Promise<any[]> {
+
+		if(!await this.userRepository.getById(id)) {
+			throw new BadRequestException('No such user');
+		}
+
+		return await this.userRepository.getRoles(id);
+	}
+
+	async changePassword(passwords: any, id: number) {
 		
-		const user: any = await this.userRepository.getById(userId);
+		const user: any = await this.userRepository.getById(id);
 
 		if(!bcrypt.compareSync(passwords.oldPassword, user.password)) {
 			throw new BadRequestException('Incorrect password');
@@ -91,7 +117,7 @@ export class UserService {
 			throw new BadRequestException('Password does not matches');
 		}
 		
-		return await this.userRepository.updateById(userId, { password: passwords.newPassword });
+		return await this.userRepository.updateById(id, { password: passwords.newPassword });
 	}
 
 	async getStatusStats() {

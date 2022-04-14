@@ -20,6 +20,8 @@ export interface IUserRepository<User> {
 
     updateProfile(userId: number, userInfo: any) : Promise<any> //
 
+    getProfile(userId: number) : Promise<any>
+
     getRoles(userId: number) : Promise<string[]>;
 
     getStatusStats() : Promise<any> //

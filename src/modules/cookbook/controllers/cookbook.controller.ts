@@ -1,4 +1,5 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, Req, Patch, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, Req, Patch, Query, ParseIntPipe, UploadedFile, Header, UseInterceptors, StreamableFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/middlewares/check-roles.middleware';
 import { Statuses } from 'src/middlewares/check-status.middleware';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
@@ -56,6 +57,20 @@ export class CookbookController {
     @Statuses('active')
     async cloneCookbook(@Param('id', ParseIntPipe) id: number, @Req() req) {
         return this.cookbookService.cloneCookbook(id, req.user.id);
+    }
+
+    @Post(':id/uploadAvatar')
+    @Statuses('active')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadAvatar(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File, @Req() req) {
+        return this.cookbookService.uploadAvatar(id, file, req.user.id);
+    }
+
+    @Get(':id/avatar')
+    @NoAuth()
+    @Statuses('active')
+    async getAvatar(@Param('id', ParseIntPipe) id: number) : Promise<StreamableFile> {
+        return this.cookbookService.getAvatar(id);
     }
     
     @Get('stats/count')

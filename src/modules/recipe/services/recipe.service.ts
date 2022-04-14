@@ -1,7 +1,8 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
 import { RECIPE_REPOSITORY } from "src/constants/repositories";
 import { Recipe } from "../entities/recipe.entity";
 import { IRecipeRepository } from "../../../interfaces/repositories/IRecipeRepository"; 
+import { createReadStream } from "fs";
 
 @Injectable()
 export class RecipeService {
@@ -48,6 +49,29 @@ export class RecipeService {
 			throw new NotFoundException('Cannot delete recipe');
 
 		return deleted;
+	}
+
+	async uploadAvatar(id: number, file: Express.Multer.File, userId: number) {
+		const recipe = await this.recipeRepository.getById(id);
+		if(!recipe) {
+			throw new NotFoundException('No such recipe');
+		}
+		if(recipe.creatorId != userId) {
+			throw new ForbiddenException('Cannot update foreign objects');
+		}
+		return await this.recipeRepository.updateById(id, { avatar: file.path });
+	}
+
+	async getAvatar(id: number) : Promise<StreamableFile> {
+		const recipe = await this.recipeRepository.getById(id);
+		if(!recipe) {
+			throw new NotFoundException('No such recipe');
+		}
+		if(!recipe.avatar) {
+			throw new BadRequestException('Nothing to download');
+		}
+		const fileStream = createReadStream(recipe.avatar);
+		return new StreamableFile(fileStream);
 	}
 
 	async countAll() {

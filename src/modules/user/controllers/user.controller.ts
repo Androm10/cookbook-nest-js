@@ -1,4 +1,4 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, UseGuards, Req, Query, ParseIntPipe, UploadedFile, UseInterceptors, StreamableFile } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
@@ -8,6 +8,7 @@ import { Roles } from 'src/middlewares/check-roles.middleware';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
 import { Statuses } from 'src/middlewares/check-status.middleware';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -36,6 +37,26 @@ export class UserController {
     @Statuses('active')
     async changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() req) {
         return this.userService.changePassword(changePasswordDto, req.user.id);
+    }
+
+    @Post('/uploadAvatar')
+    @UseInterceptors(FileInterceptor('file'))
+    @Statuses('active')
+    async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+        return this.userService.uploadAvatar(file, req.user.id);
+    }
+
+    @Get(':id/avatar')
+    @NoAuth()
+    @Statuses('active')
+    async getAvatar(@Param('id', ParseIntPipe) id: number) : Promise<StreamableFile> {
+        return this.userService.getAvatar(id);
+    }
+
+    @Get(':id/profile')
+    @Statuses('active')
+    async getProfile(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.getProfile(id);
     }
 
     @Post()

@@ -6,7 +6,24 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import config from './services/config';
-import { MulterModule } from '@nestjs/platform-express';
+import { RabbitBroker } from './services/rabbitmq/broker.service';
+import { RMQ_BROKER } from './constants/rabbitmq';
+
+const RmqBrokerFactory = {
+	provide: RMQ_BROKER,
+	useFactory: async (configService : ConfigService) => {
+		const options = {
+			url: configService.get('amqp.url'),
+			durable: configService.get('amqp.durable')
+		}
+		const broker = new RabbitBroker(options);
+		await broker.init();
+		return  broker;
+	},
+	inject : [ConfigService]
+}
+
+
 
 @Module({
 	imports: [CookbookModule, 
@@ -23,14 +40,10 @@ import { MulterModule } from '@nestjs/platform-express';
 					ttl : configService.get('rateLimit.ttl')
 				}),
 			inject : [ConfigService]
-		}),
-		MulterModule.registerAsync({
-			useFactory : async (configService : ConfigService) => ({
-				dest : configService.get('assetsDir')
-			}),
-			inject : [ConfigService]
 		})
 	],
+	providers: [RmqBrokerFactory],
 	controllers: [],
+	exports: []
 })
 export class AppModule {}

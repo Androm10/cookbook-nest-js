@@ -1,4 +1,5 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
+import { createReadStream } from "fs";
 import { COOKBOOK_REPOSITORY } from "src/constants/repositories";
 import { ICookbookRepository } from "../../../interfaces/repositories/ICookbookRepository"; 
 import { Cookbook } from "../entities/cookbook.entity";
@@ -86,6 +87,29 @@ export class CookbookService {
 			throw new BadRequestException('No such cookbook');
 		}
 		return await this.cookbookRepository.cloneCookbook(id, userId);
+	}
+
+	async uploadAvatar(id: number, file: Express.Multer.File, userId: number) {
+		const cookbook = await this.cookbookRepository.getById(id);
+		if(!cookbook) {
+			throw new NotFoundException('No such cookbook');
+		}
+		if(cookbook.creatorId != userId) {
+			throw new ForbiddenException('Cannot update foreign objects');
+		}
+		return await this.cookbookRepository.updateById(id, { avatar: file.path });
+	}
+
+	async getAvatar(id: number) : Promise<StreamableFile> {
+		const cookbook = await this.cookbookRepository.getById(id);
+		if(!cookbook) {
+			throw new NotFoundException('No such cookbook');
+		}
+		if(!cookbook.avatar) {
+			throw new BadRequestException('Nothing to download');
+		}
+		const fileStream = createReadStream(cookbook.avatar);
+		return new StreamableFile(fileStream);
 	}
 
 	async countAll() {

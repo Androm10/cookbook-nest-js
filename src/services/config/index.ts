@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-const conf = dotenv.config({ path: path.resolve(`${process.env.NODE_ENVIRONMENT}.env`) });
+dotenv.config({ path: path.resolve(`${process.env.NODE_ENVIRONMENT}.env`) });
 
 export default () => ({
     database : {
@@ -18,5 +18,9 @@ export default () => ({
         ttl: 60,
         limit: 3
     },
-    assetsDir : process.env.ASSETS_DIR || path.resolve('assets')
+    assetsDir : process.env.ASSETS_DIR || path.resolve('assets'),
+    amqp : {
+        url : process.env.RMQ_URL || 'amqp://localhost:5672',
+        durable : process.env.RMQ_DURABLE || false
+    }
 });

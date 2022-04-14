@@ -91,6 +91,10 @@ export class UserRepository implements IUserRepository<User> {
         return await user.update(userInfo);
     }
 
+    async getProfile(userId: number) {
+        return await models.userInfo.findOne({ where: { userId } });
+    }
+
     async getRoles(userId: number) {
 
         const user: any = await models.user.findByPk(userId);

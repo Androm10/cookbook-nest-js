@@ -1,4 +1,5 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, Req, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, Put, Delete, Req, Query, ParseIntPipe, UploadedFile, UseInterceptors, StreamableFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/middlewares/check-roles.middleware';
 import { Statuses } from 'src/middlewares/check-status.middleware';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
@@ -38,6 +39,20 @@ export class RecipeController {
     @Statuses('active')
     async deleteById(@Param('id', ParseIntPipe) id: number) {
         return this.recipeService.deleteById(id);
+    }
+
+    @Post(':id/uploadAvatar')
+    @UseInterceptors(FileInterceptor('file'))
+    @Statuses('active')
+    async uploadAvatar(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File, @Req() req) {
+        return this.recipeService.uploadAvatar(id, file, req.user.id);
+    }
+
+    @Get(':id/avatar')
+    @NoAuth()
+    @Statuses('active')
+    async getAvatar(@Param('id', ParseIntPipe) id: number) : Promise<StreamableFile> {
+        return this.recipeService.getAvatar(id);
     }
 
     @Get('stats/count')
