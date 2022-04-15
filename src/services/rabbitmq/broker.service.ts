@@ -1,17 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import * as amqplib from "amqplib";
-
-interface IBrokerOptions {
-    url: string,
-    durable?: boolean,
-}
+import { Broker, BrokerOptions } from "src/interfaces/arguments/broker-options";
 
 
 @Injectable()
-export class RabbitBroker {
+export class RabbitBroker implements Broker {
 	private channel: amqplib.Channel;
 
-    constructor(private options: IBrokerOptions) { }
+    constructor(private options: BrokerOptions) { }
 
     async init() {
         const connection = await amqplib.connect(this.options.url);
@@ -22,7 +18,7 @@ export class RabbitBroker {
         await this.channel.assertQueue(queue, {
             durable : this.options.durable ?? false,
         });
-        this.channel.sendToQueue(queue, Buffer.from(message), {});
+        this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {});
     }
 
 }

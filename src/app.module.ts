@@ -7,22 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import config from './services/config';
 import { RabbitBroker } from './services/rabbitmq/broker.service';
-import { RMQ_BROKER } from './constants/rabbitmq';
-
-const RmqBrokerFactory = {
-	provide: RMQ_BROKER,
-	useFactory: async (configService : ConfigService) => {
-		const options = {
-			url: configService.get('amqp.url'),
-			durable: configService.get('amqp.durable')
-		}
-		const broker = new RabbitBroker(options);
-		await broker.init();
-		return  broker;
-	},
-	inject : [ConfigService]
-}
-
+import { BrokerModule } from './services/rabbitmq/broker.module';
 
 
 @Module({
@@ -40,9 +25,21 @@ const RmqBrokerFactory = {
 					ttl : configService.get('rateLimit.ttl')
 				}),
 			inject : [ConfigService]
-		})
+		}),
+		BrokerModule.forRootAsync({
+			useFactory: async (configService : ConfigService) => {
+				const options = {
+					url: configService.get('amqp.url'),
+					durable: configService.get('amqp.durable')
+				}
+				const broker = new RabbitBroker(options);
+				await broker.init();
+				return  broker;
+			},
+			inject: [ConfigService]
+		}),
 	],
-	providers: [RmqBrokerFactory],
+	providers: [],
 	controllers: [],
 	exports: []
 })

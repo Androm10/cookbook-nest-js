@@ -9,6 +9,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
 import { Statuses } from 'src/middlewares/check-status.middleware';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResetRequestDto } from '../dto/reset-request.dto';
 
 @Controller('user')
 export class UserController {
@@ -57,6 +58,12 @@ export class UserController {
     @Statuses('active')
     async getProfile(@Param('id', ParseIntPipe) id: number) {
         return this.userService.getProfile(id);
+    }
+
+    @Post('resetPassword')
+    @NoAuth()
+    async resetRequest(@Body() resetRequestDto: ResetRequestDto) {
+        return this.userService.resetRequest(resetRequestDto.login);
     }
 
     @Post()

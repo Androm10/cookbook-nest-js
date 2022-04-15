@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../../user/services/user.service";
 import * as bcrypt from 'bcrypt';
+import { RMQ_BROKER } from "src/constants/rabbitmq";
+import { RabbitBroker } from "src/services/rabbitmq/broker.service";
+import { MAILER_QUEUE, MAIL_TYPES } from "src/constants/mailer";
 
 
 @Injectable()
 export class AuthService {
-    constructor(private userService : UserService, private jwtService : JwtService) {}
+    constructor(private userService : UserService, 
+        private jwtService : JwtService,
+        @Inject(RMQ_BROKER) private broker: RabbitBroker) {}
     
     async validateUser(id: number) {
         try {
@@ -41,6 +46,11 @@ export class AuthService {
         if(await this.userService.getByLogin(userData.login)) {
             throw new BadRequestException('User with such login already exists');
         }
+
+        this.broker.sendMessage(MAILER_QUEUE, {
+            type: MAIL_TYPES.WELCOME_MAIL,
+            to: userData.login
+        });
 
         return await this.userService.registerUser({status: "active", ...userData});
 

@@ -10,8 +10,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CheckRolesGuard } from './guards/check-roles.guard';
 import { CheckStatusesGuard } from './guards/check-status.guard';
-import { RMQ_BROKER } from 'src/constants/rabbitmq';
-import { RabbitBroker } from 'src/services/rabbitmq/broker.service';
 
 @Module({
     controllers: [AuthController],

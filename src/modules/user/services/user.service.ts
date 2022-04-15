@@ -1,13 +1,19 @@
+import * as bcrypt from 'bcrypt';
+import * as uuid from 'uuid';
 import { BadRequestException, Inject, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
 import { IUserRepository } from "../../../interfaces/repositories/IUserRepository"; 
-import * as bcrypt from 'bcrypt';
 import { USER_REPOSITORY } from "src/constants/repositories";
 import { User } from "../entities/user.entity";
 import { createReadStream } from "fs";
+import { RMQ_BROKER } from 'src/constants/rabbitmq';
+import { RabbitBroker } from 'src/services/rabbitmq/broker.service';
+import { MAILER_QUEUE, MAIL_TYPES } from 'src/constants/mailer';
+
 
 @Injectable()
 export class UserService {
-	constructor(@Inject(USER_REPOSITORY) private userRepository: IUserRepository<User>) {}
+	constructor(@Inject(USER_REPOSITORY) private userRepository: IUserRepository<User>, 
+		@Inject(RMQ_BROKER) private broker: RabbitBroker) {}
 
 	async getById(id: number) {
 		const user = await this.userRepository.getById(id);
@@ -118,6 +124,45 @@ export class UserService {
 		}
 		
 		return await this.userRepository.updateById(id, { password: passwords.newPassword });
+	}
+
+	async resetRequest(login: string) {
+		//add mongoose integration + mail interfaces
+
+		// const user = await this.userRepository.getByLogin(login);
+		// if(!user) {
+		// 	throw new BadRequestException('No user with provided login was found');
+		// }
+		// const resetToken = {
+		// 	user: login,
+		// 	token: uuid.v4() 
+		// }
+		// await resetTokenManager.addToken(resetToken);
+		// const mail = {
+		// 	type: MAIL_TYPES.RESET_MAIL,
+		// 	to: login,
+		// 	context: {
+		// 		name: login,
+		// 		link: `http://${'localhost'}:3000/resetPassword/{${resetToken.token}}`
+		// 	}
+		// }
+		// this.broker.sendMessage(MAILER_QUEUE, mail);
+		// return true;
+	}
+
+	async resetPassword(uuid, newPassword) {
+		// let token = await resetTokenManager.getByUUID(id);
+
+        // if(!token) 
+        //     throw new ResponseError('invalid token', 400);
+        
+        
+        // let hashedPassword = await crypt.cryptPassword(newPassword);
+        
+        // let user = await userRepository.getByLogin(token.user);
+        // await user.update({ password :  hashedPassword});
+        
+        // return user;
 	}
 
 	async getStatusStats() {
