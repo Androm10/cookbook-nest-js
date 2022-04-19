@@ -1,103 +1,96 @@
-import { Injectable } from "@nestjs/common";
-import { IRecipeRepository } from "src/interfaces/repositories/IRecipeRepository";
-import { models } from "src/services/database/sequelize";
-import { Recipe } from "../entities/recipe.entity";
-
+import { Injectable } from '@nestjs/common';
+import { IRecipeRepository } from 'src/interfaces/repositories/IRecipeRepository';
+import { models } from 'src/services/database/sequelize';
+import { Recipe } from '../entities/recipe.entity';
 
 @Injectable()
 export class RecipeRepository implements IRecipeRepository<Recipe> {
+	async getById(id: number): Promise<Recipe> {
+		const found = await models.recipe.findByPk(id);
 
-	async getById(id: number): Promise<Recipe> {		
-        const found = await models.recipe.findByPk(id);
-        
-        if(!found)
-            return null;
+		if (!found) return null;
 
-        return new Recipe(found);
-  	}
+		return new Recipe(found);
+	}
 
-    async getAll(limit: number, offset: number): Promise<{rows: Recipe[], count: number}> {
-        
-        const found = await models.recipe.findAndCountAll({ limit, offset });
-        
-        return {
-            rows: found.rows.map(recipe => {
-                return new Recipe(recipe);
-            }),
-            count: found.count
-        };
-  	}
+	async getAll(
+		limit: number,
+		offset: number,
+	): Promise<{ rows: Recipe[]; count: number }> {
+		const found = await models.recipe.findAndCountAll({ limit, offset });
 
-    async create(recipeData: any): Promise<Recipe> {
-        
-        const recipe = await models.recipe.create(recipeData);
-        return new Recipe(recipe);
-    }
+		return {
+			rows: found.rows.map((recipe) => {
+				return new Recipe(recipe);
+			}),
+			count: found.count,
+		};
+	}
 
-    async updateById(id: number, recipeData: any): Promise<Recipe> {
-        
-        const recipe = await models.recipe.findByPk(id);
+	async create(recipeData: any): Promise<Recipe> {
+		const recipe = await models.recipe.create(recipeData);
+		return new Recipe(recipe);
+	}
 
-        if(!recipe)
-            return null;
+	async updateById(id: number, recipeData: any): Promise<Recipe> {
+		const recipe = await models.recipe.findByPk(id);
 
-        await recipe.update(recipeData);
+		if (!recipe) return null;
 
-        return new Recipe(recipe);
-    } 
+		await recipe.update(recipeData);
 
-    async deleteById(id: number): Promise<boolean> {
+		return new Recipe(recipe);
+	}
 
-        const recipe = await models.recipe.findByPk(id);
-        try {
-            await recipe.destroy();
-        }
-        catch(e) {
-            return false;
-        }
-        return true;
-    }
-    
-    async countAll() {
-        const fn = models.recipe.sequelize.fn;
-        const col = models.recipe.sequelize.col;
+	async deleteById(id: number): Promise<boolean> {
+		const recipe = await models.recipe.findByPk(id);
+		try {
+			await recipe.destroy();
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
 
-        const count = await models.recipe.findAll({
-            attributes : [[fn('COUNT', col('id')), 'recipes']]
-        })
-        return count[0];
-    }
+	async countAll() {
+		const fn = models.recipe.sequelize.fn;
+		const col = models.recipe.sequelize.col;
 
-    async getViews(id: number) {
-        const fn = models.recipe.sequelize.fn;
-        const col = models.recipe.sequelize.col;
+		const count = await models.recipe.findAll({
+			attributes: [[fn('COUNT', col('id')), 'recipes']],
+		});
+		return count[0];
+	}
 
-        const views = await models.recipeView.findAll({
-            attributes: [[fn('COUNT', col('id')), 'views'] ],
-            where : {
-                recipeId : id
-            }
-        });
-        return views[0];
-    }
+	async getViews(id: number) {
+		const fn = models.recipe.sequelize.fn;
+		const col = models.recipe.sequelize.col;
 
-    async mostPopular() {
-        const fn = models.recipe.sequelize.fn;
-        const col = models.recipe.sequelize.col;
-        const literal = models.recipe.sequelize.literal;
+		const views = await models.recipeView.findAll({
+			attributes: [[fn('COUNT', col('id')), 'views']],
+			where: {
+				recipeId: id,
+			},
+		});
+		return views[0];
+	}
 
-        const recipe = await models.recipe.findAll({
-            include : {
-                model : models.recipeView,
-                attributes: [[fn('COUNT', col('recipeViews.id')), 'count']],
-                required : true
-            },
-            group: 'recipe.id',
-            order: literal('"recipeViews.count" DESC'),
-            limit: 1
-        })
-        
-        return recipe[0];
-    }
+	async mostPopular() {
+		const fn = models.recipe.sequelize.fn;
+		const col = models.recipe.sequelize.col;
+		const literal = models.recipe.sequelize.literal;
 
+		const recipe = await models.recipe.findAll({
+			include: {
+				model: models.recipeView,
+				attributes: [[fn('COUNT', col('recipeViews.id')), 'count']],
+				required: true,
+			},
+			group: 'recipe.id',
+			order: literal('"recipeViews.count" DESC'),
+			limit: 1,
+		});
+
+		return recipe[0];
+	}
 }

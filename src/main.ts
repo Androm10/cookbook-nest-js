@@ -2,15 +2,19 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
+import { APP_LOGGER } from './constants/logger';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	app.use(helmet());
 	app.enableCors();
-	app.useGlobalPipes(new ValidationPipe({ 
-		transform: true, 
-		transformOptions: { enableImplicitConversion: true } 
-	}));
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			transformOptions: { enableImplicitConversion: true },
+		}),
+	);
+	app.useLogger(app.get(APP_LOGGER));
 	await app.listen(3000);
 }
 bootstrap();

@@ -5,21 +5,19 @@ import { SignupDto } from '../dto/singup.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
 
-
 @UseGuards(ThrottlerGuard)
 @NoAuth()
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+	constructor(private readonly authService: AuthService) {}
 
-    @Post('/logIn')
-    async logIn(@Req() req, @Body() loginDto: LoginDto) {
-        return await this.authService.logIn(loginDto);
-    }
-    
-    @Post('/signUp')
-    async signUp(@Body() signupDto: SignupDto) {
-       return await this.authService.signUp(signupDto);
-    }
-    
+	@Post('/logIn')
+	async logIn(@Req() req, @Body() loginDto: LoginDto) {
+		return await this.authService.logIn(loginDto);
+	}
+
+	@Post('/signUp')
+	async signUp(@Body() signupDto: SignupDto) {
+		return await this.authService.signUp(signupDto);
+	}
 }

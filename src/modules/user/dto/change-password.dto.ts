@@ -1,14 +1,13 @@
 import { MaxLength, MinLength } from 'class-validator';
 
 export class ChangePasswordDto {
-    
-    oldPassword: string;
+	oldPassword: string;
 
-    @MaxLength(30)
-    @MinLength(8)
-    newPassword: string
+	@MaxLength(30)
+	@MinLength(8)
+	newPassword: string;
 
-    @MaxLength(30)
-    @MinLength(8)
-    newPasswordConfirm: string
+	@MaxLength(30)
+	@MinLength(8)
+	newPasswordConfirm: string;
 }

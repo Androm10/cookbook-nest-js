@@ -8,39 +8,42 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import config from './services/config';
 import { RabbitBroker } from './services/rabbitmq/broker.service';
 import { BrokerModule } from './services/rabbitmq/broker.module';
-
+import { LoggerModule } from './services/logger/logger.module';
+import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
-	imports: [CookbookModule, 
+	imports: [
+		CookbookModule,
 		RecipeModule,
-		UserModule, 
+		UserModule,
 		AuthModule,
+		LoggerModule,
 		ConfigModule.forRoot({
 			load: [config],
-			isGlobal: true
+			isGlobal: true,
 		}),
 		ThrottlerModule.forRootAsync({
-			useFactory : async (configService : ConfigService) => ({
-					limit : configService.get('rateLimit.limit'),
-					ttl : configService.get('rateLimit.ttl')
-				}),
-			inject : [ConfigService]
+			useFactory: async (configService: ConfigService) => ({
+				limit: configService.get('rateLimit.limit'),
+				ttl: configService.get('rateLimit.ttl'),
+			}),
+			inject: [ConfigService],
 		}),
 		BrokerModule.forRootAsync({
-			useFactory: async (configService : ConfigService) => {
+			useFactory: async (configService: ConfigService) => {
 				const options = {
 					url: configService.get('amqp.url'),
-					durable: configService.get('amqp.durable')
-				}
+					durable: configService.get('amqp.durable'),
+				};
 				const broker = new RabbitBroker(options);
 				await broker.init();
-				return  broker;
+				return broker;
 			},
-			inject: [ConfigService]
+			inject: [ConfigService],
 		}),
 	],
 	providers: [],
 	controllers: [],
-	exports: []
+	exports: [],
 })
 export class AppModule {}

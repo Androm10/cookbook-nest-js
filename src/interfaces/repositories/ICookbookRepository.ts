@@ -1,24 +1,26 @@
 export interface ICookbookRepository<Cookbook> {
-    
-    getById(id: number) : Promise<Cookbook>;
-    
-    getAll(limit: number, offset: number) : Promise<{rows: Cookbook[], count: number}>;
-    
-    create(dto: unknown) : Promise<Cookbook>;
+	getById(id: number): Promise<Cookbook>;
 
-    updateById(id: number, dto: unknown) : Promise<Cookbook>
+	getAll(
+		limit: number,
+		offset: number,
+	): Promise<{ rows: Cookbook[]; count: number }>;
 
-    deleteById(id: number) : Promise<boolean>;
+	create(dto: unknown): Promise<Cookbook>;
 
-    linkRecipe(cookbookId: number, recipeId: number) : Promise<boolean>;
+	updateById(id: number, dto: unknown): Promise<Cookbook>;
 
-    unlinkRecipe(cookbookId: number, recipeId: number) : Promise<boolean>;
+	deleteById(id: number): Promise<boolean>;
 
-    cloneCookbook(id: number, userId: number) : Promise<Cookbook>
+	linkRecipe(cookbookId: number, recipeId: number): Promise<boolean>;
 
-    countAll() : Promise<any>; //
+	unlinkRecipe(cookbookId: number, recipeId: number): Promise<boolean>;
 
-    getViews(id: number) : Promise<any>; //
+	cloneCookbook(id: number, userId: number): Promise<Cookbook>;
 
-    mostPopular() : Promise<any> //
+	countAll(): Promise<any>; //
+
+	getViews(id: number): Promise<any>; //
+
+	mostPopular(): Promise<any>; //
 }

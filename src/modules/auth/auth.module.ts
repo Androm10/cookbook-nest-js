@@ -12,36 +12,36 @@ import { CheckRolesGuard } from './guards/check-roles.guard';
 import { CheckStatusesGuard } from './guards/check-status.guard';
 
 @Module({
-    controllers: [AuthController],
-    imports: [
-        UserModule,
-        PassportModule.register({ defaultStrategy: 'jwt'}),
-        JwtModule.registerAsync({
-            useFactory: async (configService: ConfigService) => ({
-            secret: configService.get<string>('auth.secret'),
-            signOptions: { expiresIn: configService.get<string>('auth.expiresIn') },
-            }),
-            inject: [ConfigService]
-        }),
-        
-    ],
-    providers: [
-        AuthService, 
-        JwtStrategy, 
-    {
-        provide : APP_GUARD,
-        useClass : JwtAuthGuard
-    },
-    {
-        provide : APP_GUARD,
-        useClass : CheckRolesGuard
-    },
-    {
-        provide : APP_GUARD,
-        useClass : CheckStatusesGuard
-    }
-],
-    exports: [],
+	controllers: [AuthController],
+	imports: [
+		UserModule,
+		PassportModule.register({ defaultStrategy: 'jwt' }),
+		JwtModule.registerAsync({
+			useFactory: async (configService: ConfigService) => ({
+				secret: configService.get<string>('auth.secret'),
+				signOptions: {
+					expiresIn: configService.get<string>('auth.expiresIn'),
+				},
+			}),
+			inject: [ConfigService],
+		}),
+	],
+	providers: [
+		AuthService,
+		JwtStrategy,
+		{
+			provide: APP_GUARD,
+			useClass: JwtAuthGuard,
+		},
+		{
+			provide: APP_GUARD,
+			useClass: CheckRolesGuard,
+		},
+		{
+			provide: APP_GUARD,
+			useClass: CheckStatusesGuard,
+		},
+	],
+	exports: [],
 })
-export class AuthModule {
-}
+export class AuthModule {}

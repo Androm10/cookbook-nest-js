@@ -1,4 +1,14 @@
-import { Controller, Param, Get, Post, Body, Put, Delete, Req, ParseIntPipe } from '@nestjs/common';
+import {
+	Controller,
+	Param,
+	Get,
+	Post,
+	Body,
+	Put,
+	Delete,
+	Req,
+	ParseIntPipe,
+} from '@nestjs/common';
 import { Statuses } from 'src/middlewares/check-status.middleware';
 import { NoAuth } from 'src/middlewares/no-auth.middleware';
 import { CreateCommentDto } from '../dto/create-comment.dto';
@@ -7,45 +17,55 @@ import { CommentService } from '../services/comment.service';
 
 @Controller('cookbookComment')
 export class CommentController {
-    constructor(private readonly commentService: CommentService) {}
+	constructor(private readonly commentService: CommentService) {}
 
-    @Get(':id')
-    @NoAuth()
-    async getById(@Param('id', ParseIntPipe) id: number) {
-        return this.commentService.getById(id);
-    }
+	@Get(':id')
+	@NoAuth()
+	async getById(@Param('id', ParseIntPipe) id: number) {
+		return this.commentService.getById(id);
+	}
 
-    @Get('/all/:cookbookId')
-    @NoAuth()
-    async getAll(@Param('cookbookId', ParseIntPipe) cookbookId: number) {
-        return this.commentService.getAll(cookbookId);
-    }
+	@Get('/all/:cookbookId')
+	@NoAuth()
+	async getAll(@Param('cookbookId', ParseIntPipe) cookbookId: number) {
+		return this.commentService.getAll(cookbookId);
+	}
 
-    @Post('/:cookbookId')
-    @Statuses('active')
-    async create(@Param('cookbookId', ParseIntPipe) cookbookId: number, @Body() createCommentDto: CreateCommentDto, @Req() req: any) {
-        const comment = {
-            text: createCommentDto.text,
-            rate: createCommentDto.rate,
-            cookbookId: cookbookId,
-            userId: req.user.id,
-            createdAt: Date.now()
-        }
+	@Post('/:cookbookId')
+	@Statuses('active')
+	async create(
+		@Param('cookbookId', ParseIntPipe) cookbookId: number,
+		@Body() createCommentDto: CreateCommentDto,
+		@Req() req: any,
+	) {
+		const comment = {
+			text: createCommentDto.text,
+			rate: createCommentDto.rate,
+			cookbookId: cookbookId,
+			userId: req.user.id,
+			createdAt: Date.now(),
+		};
 
-        return this.commentService.create(comment);
-    }
+		return this.commentService.create(comment);
+	}
 
-    @Put(':id')
-    @Statuses('active')
-    async updateById(@Param('id', ParseIntPipe) id: number, @Body() updateCommentDto: UpdateCommentDto, @Req() req: any) {
-        return this.commentService.updateById(id, req.user.id, updateCommentDto);
-    }
+	@Put(':id')
+	@Statuses('active')
+	async updateById(
+		@Param('id', ParseIntPipe) id: number,
+		@Body() updateCommentDto: UpdateCommentDto,
+		@Req() req: any,
+	) {
+		return this.commentService.updateById(
+			id,
+			req.user.id,
+			updateCommentDto,
+		);
+	}
 
-    @Delete(':id')
-    @Statuses('active')
-    async deleteById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-        return this.commentService.deleteById(id, req.user.id);
-    }
-
-
+	@Delete(':id')
+	@Statuses('active')
+	async deleteById(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+		return this.commentService.deleteById(id, req.user.id);
+	}
 }

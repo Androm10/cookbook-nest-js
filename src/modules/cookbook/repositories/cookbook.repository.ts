@@ -1,173 +1,160 @@
-import { Injectable } from "@nestjs/common";
-import { ICookbookRepository } from "src/interfaces/repositories/ICookbookRepository";
-import { models } from "src/services/database/sequelize";
-import { Cookbook } from "../entities/cookbook.entity";
-
+import { Injectable } from '@nestjs/common';
+import { ICookbookRepository } from 'src/interfaces/repositories/ICookbookRepository';
+import { models } from 'src/services/database/sequelize';
+import { Cookbook } from '../entities/cookbook.entity';
 
 @Injectable()
 export class CookbookRepository implements ICookbookRepository<Cookbook> {
+	async getById(id: number): Promise<Cookbook> {
+		const found = await models.cookbook.findByPk(id);
 
-	async getById(id: number): Promise<Cookbook> {		
+		if (!found) return null;
 
-        const found = await models.cookbook.findByPk(id);
+		return new Cookbook(found);
+	}
 
-        if(!found)
-            return null;
+	async getAll(
+		limit: number,
+		offset: number,
+	): Promise<{ rows: Cookbook[]; count: number }> {
+		const found = await models.cookbook.findAndCountAll({ limit, offset });
+		return {
+			rows: found.rows.map((cookbook) => {
+				return new Cookbook(cookbook);
+			}),
+			count: found.count,
+		};
+	}
 
-        return new Cookbook(found);
-  	}
+	async create(cookbookData: any): Promise<Cookbook> {
+		const cookbook = await models.cookbook.create(cookbookData);
+		return new Cookbook(cookbook);
+	}
 
-    async getAll(limit: number, offset: number): Promise<{rows: Cookbook[], count: number}> {
+	async updateById(id: number, cookbookData: any): Promise<Cookbook> {
+		const cookbook = await models.cookbook.findByPk(id);
 
-        const found = await models.cookbook.findAndCountAll({limit, offset});
-        return {
-            rows: found.rows.map(cookbook => {
-                return new Cookbook(cookbook);
-            }),
-            count: found.count
-        };
-  	}
+		if (!cookbook) return null;
 
-    async create(cookbookData: any): Promise<Cookbook> {
-        
-        const cookbook = await models.cookbook.create(cookbookData);
-        return new Cookbook(cookbook);
-    }
+		await cookbook.update(cookbookData);
 
-    async updateById(id: number, cookbookData: any): Promise<Cookbook> {
-        
-        const cookbook = await models.cookbook.findByPk(id);
+		return new Cookbook(cookbook);
+	}
 
-        if(!cookbook)
-            return null;
+	async deleteById(id: number): Promise<boolean> {
+		const cookbook = await models.cookbook.findByPk(id);
+		try {
+			await cookbook.destroy();
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
 
-        await cookbook.update(cookbookData);
+	async linkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
+		const recipe = await models.recipe.findByPk(recipeId);
 
-        return new Cookbook(cookbook);
-    } 
+		if (!recipe) return null;
 
-    async deleteById(id: number): Promise<boolean> {
+		try {
+			await models.cookbooksRecipes.findOrCreate({
+				where: { recipeId, cookbookId },
+			});
+			return true;
+		} catch (error) {
+			return false;
+		}
+	}
 
-        const cookbook = await models.cookbook.findByPk(id);
-        try {
-            await cookbook.destroy();
-        }
-        catch(e) {
-            return false;
-        }
-        return true;
-    }
-      
-    async linkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
-        
-        const recipe = await models.recipe.findByPk(recipeId);
-        
-        if(!recipe)
-            return null;
+	async unlinkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
+		const recipe = await models.recipe.findByPk(recipeId);
 
-        try {
-            await models.cookbooksRecipes.findOrCreate({ where: {recipeId, cookbookId}});
-            return true;
-        }
-        catch(error) {
-            return false;
-        }
-        
-    }
+		if (!recipe) return null;
 
-    async unlinkRecipe(cookbookId: number, recipeId: number): Promise<boolean> {
-        
-        const recipe = await models.recipe.findByPk(recipeId);
-        
-        if(!recipe)
-            return null;
+		const link = await models.cookbooksRecipes.findOne({
+			where: { cookbookId, recipeId },
+		});
 
-        const link = await models.cookbooksRecipes.findOne({ where: { cookbookId, recipeId } });
-        
-        if(!link) {
-            return false;
-        }
+		if (!link) {
+			return false;
+		}
 
-        try {
-            await link.destroy();
-            return true;
-        }
-        catch(error) {
-            return false;
-        }
+		try {
+			await link.destroy();
+			return true;
+		} catch (error) {
+			return false;
+		}
+	}
 
-    }
+	async cloneCookbook(id: number, userId: number): Promise<Cookbook> {
+		const cookbook: any = await models.cookbook.findByPk(id);
+		const recipes: any[] = await cookbook.getRecipes();
 
-    async cloneCookbook(id: number, userId: number): Promise<Cookbook> {
-        
-        const cookbook: any = await models.cookbook.findByPk(id);       
-        const recipes: any[] = await cookbook.getRecipes();
+		const clonedCookbook: any = await models.cookbook.create({
+			name: cookbook.name,
+			description: cookbook.description,
+			creatorId: userId,
+		});
 
-        const clonedCookbook: any = await models.cookbook.create({
-            name: cookbook.name,
-            description: cookbook.description,
-            creatorId: userId
-        });
+		let createdRecipes: any[] = recipes.map((recipe) => {
+			return {
+				name: recipe.name,
+				description: recipe.description,
+				directions: recipe.directions,
+				ingridients: recipe.ingridients,
+				cookingTime: recipe.cookingTime,
+				avatar: recipe.avatar,
+				creatorId: userId,
+			};
+		});
 
-        let createdRecipes: any[] = recipes.map((recipe) => {
-            return {
-                name: recipe.name,
-                description: recipe.description,
-                directions: recipe.directions,
-                ingridients: recipe.ingridients,
-                cookingTime: recipe.cookingTime,
-                avatar: recipe.avatar,
-                creatorId: userId
-            };
-        });
+		createdRecipes = await models.recipe.bulkCreate(createdRecipes);
 
-        createdRecipes = await models.recipe.bulkCreate(createdRecipes);
+		await clonedCookbook.addRecipes(createdRecipes);
 
-        await clonedCookbook.addRecipes(createdRecipes);
+		return new Cookbook(clonedCookbook);
+	}
 
-        return new Cookbook(clonedCookbook);
-    }
+	async countAll() {
+		const fn = models.cookbook.sequelize.fn;
+		const col = models.cookbook.sequelize.col;
 
-    async countAll() {
-        const fn = models.cookbook.sequelize.fn;
-        const col = models.cookbook.sequelize.col;
+		const count = await models.cookbook.findAll({
+			attributes: [[fn('COUNT', col('id')), 'cookbooks']],
+		});
+		return count[0];
+	}
 
-        const count = await models.cookbook.findAll({
-            attributes : [[fn('COUNT', col('id')), 'cookbooks']]
-        })
-        return count[0];
-    }
+	async getViews(id: number) {
+		const fn = models.cookbook.sequelize.fn;
+		const col = models.cookbook.sequelize.col;
 
-    async getViews(id: number) {
-        const fn = models.cookbook.sequelize.fn;
-        const col = models.cookbook.sequelize.col;
+		const views = await models.cookbookView.findAll({
+			attributes: [[fn('COUNT', col('id')), 'views']],
+			where: {
+				cookbookId: id,
+			},
+		});
+		return views[0];
+	}
 
-        const views = await models.cookbookView.findAll({
-            attributes: [[fn('COUNT', col('id')), 'views'] ],
-            where : {
-                cookbookId : id
-            }
-        });
-        return views[0];
-    }
+	async mostPopular() {
+		const fn = models.cookbook.sequelize.fn;
+		const col = models.cookbook.sequelize.col;
+		const literal = models.cookbook.sequelize.literal;
 
-    async mostPopular() {
-        const fn = models.cookbook.sequelize.fn;
-        const col = models.cookbook.sequelize.col;
-        const literal = models.cookbook.sequelize.literal;
+		const cookbook = await models.cookbook.findAll({
+			include: {
+				model: models.cookbookView,
+				attributes: [[fn('COUNT', col('cookbookViews.id')), 'count']],
+				required: true,
+			},
+			group: 'cookbook.id',
+			order: literal('"cookbookViews.count" DESC'),
+			limit: 1,
+		});
 
-        const cookbook = await models.cookbook.findAll({
-            include : {
-                model : models.cookbookView,
-                attributes: [[fn('COUNT', col('cookbookViews.id')), 'count']],
-                required : true
-            },
-            group: 'cookbook.id',
-            order: literal('"cookbookViews.count" DESC'),
-            limit: 1
-        })
-        
-        return cookbook[0];
-    }
-
+		return cookbook[0];
+	}
 }

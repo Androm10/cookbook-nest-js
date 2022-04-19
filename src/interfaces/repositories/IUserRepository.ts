@@ -1,30 +1,32 @@
 export interface IUserRepository<User> {
-    
-    getById(id: number) : Promise<User>;
-    
-    getAll(limit: number, offset: number) : Promise<{rows: User[], count: number}>;
-    
-    create(dto: unknown) : Promise<User>;
+	getById(id: number): Promise<User>;
 
-    updateById(id: number, dto: unknown) : Promise<User>
+	getAll(
+		limit: number,
+		offset: number,
+	): Promise<{ rows: User[]; count: number }>;
 
-    deleteById(id: number) : Promise<boolean>;
+	create(dto: unknown): Promise<User>;
 
-    getByLogin(login: string) : Promise<User>
+	updateById(id: number, dto: unknown): Promise<User>;
 
-    registerUser(userData: {
-        login : string, 
-        password : string, 
-        status : string,
-    }): Promise<User>
+	deleteById(id: number): Promise<boolean>;
 
-    updateProfile(userId: number, userInfo: any) : Promise<any> //
+	getByLogin(login: string): Promise<User>;
 
-    getProfile(userId: number) : Promise<any>
+	registerUser(userData: {
+		login: string;
+		password: string;
+		status: string;
+	}): Promise<User>;
 
-    getRoles(userId: number) : Promise<string[]>;
+	updateProfile(userId: number, userInfo: any): Promise<any>; //
 
-    getStatusStats() : Promise<any> //
+	getProfile(userId: number): Promise<any>;
 
-    mostActive() : Promise<any> //
+	getRoles(userId: number): Promise<string[]>;
+
+	getStatusStats(): Promise<any>; //
+
+	mostActive(): Promise<any>; //
 }

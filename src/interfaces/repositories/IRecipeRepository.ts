@@ -1,18 +1,20 @@
 export interface IRecipeRepository<Recipe> {
-    
-    getById(id: number) : Promise<Recipe>;
-    
-    getAll(limit: number, offset: number) : Promise<{rows: Recipe[], count: number}>;
-    
-    create(dto: unknown) : Promise<Recipe>;
+	getById(id: number): Promise<Recipe>;
 
-    updateById(id: number, dto: unknown) : Promise<Recipe>
+	getAll(
+		limit: number,
+		offset: number,
+	): Promise<{ rows: Recipe[]; count: number }>;
 
-    deleteById(id: number) : Promise<boolean>;
+	create(dto: unknown): Promise<Recipe>;
 
-    countAll() : Promise<any>; //
+	updateById(id: number, dto: unknown): Promise<Recipe>;
 
-    getViews(id: number) : Promise<any>; //
+	deleteById(id: number): Promise<boolean>;
 
-    mostPopular() : Promise<any> //
+	countAll(): Promise<any>; //
+
+	getViews(id: number): Promise<any>; //
+
+	mostPopular(): Promise<any>; //
 }

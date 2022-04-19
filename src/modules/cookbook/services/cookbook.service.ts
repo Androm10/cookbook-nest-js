@@ -1,29 +1,42 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
-import { createReadStream } from "fs";
-import { COOKBOOK_REPOSITORY } from "src/constants/repositories";
-import { ICookbookRepository } from "../../../interfaces/repositories/ICookbookRepository"; 
-import { Cookbook } from "../entities/cookbook.entity";
+import {
+	BadRequestException,
+	ForbiddenException,
+	Inject,
+	Injectable,
+	NotFoundException,
+	StreamableFile,
+} from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { COOKBOOK_REPOSITORY } from 'src/constants/repositories';
+import { ICookbookRepository } from '../../../interfaces/repositories/ICookbookRepository';
+import { Cookbook } from '../entities/cookbook.entity';
 
 @Injectable()
 export class CookbookService {
-	constructor(@Inject(COOKBOOK_REPOSITORY) private cookbookRepository: ICookbookRepository<Cookbook>) {}
+	constructor(
+		@Inject(COOKBOOK_REPOSITORY)
+		private cookbookRepository: ICookbookRepository<Cookbook>,
+	) {}
 
 	async getById(id: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
-		
-		if(!cookbook)
-			throw new NotFoundException('No such cookbook');
+
+		if (!cookbook) throw new NotFoundException('No such cookbook');
 
 		return cookbook;
-  	}
+	}
 
 	async getAll(limit: number, page: number) {
-		const cookbooks = await this.cookbookRepository.getAll(limit, (page - 1)*limit);
+		const cookbooks = await this.cookbookRepository.getAll(
+			limit,
+			(page - 1) * limit,
+		);
 
-		return { body : cookbooks.rows, 
-			count : cookbooks.count,
-			pages : Math.ceil(cookbooks.count / limit),
-			page :  page
+		return {
+			body: cookbooks.rows,
+			count: cookbooks.count,
+			pages: Math.ceil(cookbooks.count / limit),
+			page: page,
 		};
 	}
 
@@ -33,9 +46,12 @@ export class CookbookService {
 	}
 
 	async updateById(id: number, cookbookData: any) {
-		const updated = await this.cookbookRepository.updateById(id, cookbookData);
+		const updated = await this.cookbookRepository.updateById(
+			id,
+			cookbookData,
+		);
 
-		if(!updated) {
+		if (!updated) {
 			throw new NotFoundException('No such cookbook');
 		}
 		return updated;
@@ -43,8 +59,8 @@ export class CookbookService {
 
 	async deleteById(id: number) {
 		const deleted = await this.cookbookRepository.deleteById(id);
-		
-		if(!deleted) {
+
+		if (!deleted) {
 			throw new NotFoundException('Cannot delete cookbook');
 		}
 		return deleted;
@@ -53,14 +69,14 @@ export class CookbookService {
 	async linkRecipe(id: number, recipeId: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new BadRequestException('No such cookbook');
 		}
 
 		const link = await this.cookbookRepository.linkRecipe(id, recipeId);
 
-		if(!link) {
-			throw new BadRequestException('Cannot add this recipe'); 
+		if (!link) {
+			throw new BadRequestException('Cannot add this recipe');
 		}
 		return link;
 	}
@@ -68,14 +84,14 @@ export class CookbookService {
 	async unlinkRecipe(id: number, recipeId: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new BadRequestException('No such cookbook');
 		}
 
 		const link = await this.cookbookRepository.unlinkRecipe(id, recipeId);
 
-		if(!link) {
-			throw new BadRequestException('Cannot unlink this recipe'); 
+		if (!link) {
+			throw new BadRequestException('Cannot unlink this recipe');
 		}
 		return link;
 	}
@@ -83,7 +99,7 @@ export class CookbookService {
 	async cloneCookbook(id: number, userId: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new BadRequestException('No such cookbook');
 		}
 		return await this.cookbookRepository.cloneCookbook(id, userId);
@@ -91,21 +107,23 @@ export class CookbookService {
 
 	async uploadAvatar(id: number, file: Express.Multer.File, userId: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new NotFoundException('No such cookbook');
 		}
-		if(cookbook.creatorId != userId) {
+		if (cookbook.creatorId != userId) {
 			throw new ForbiddenException('Cannot update foreign objects');
 		}
-		return await this.cookbookRepository.updateById(id, { avatar: file.path });
+		return await this.cookbookRepository.updateById(id, {
+			avatar: file.path,
+		});
 	}
 
-	async getAvatar(id: number) : Promise<StreamableFile> {
+	async getAvatar(id: number): Promise<StreamableFile> {
 		const cookbook = await this.cookbookRepository.getById(id);
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new NotFoundException('No such cookbook');
 		}
-		if(!cookbook.avatar) {
+		if (!cookbook.avatar) {
 			throw new BadRequestException('Nothing to download');
 		}
 		const fileStream = createReadStream(cookbook.avatar);
@@ -119,14 +137,13 @@ export class CookbookService {
 	async getViews(id: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 
-		if(!cookbook) {
+		if (!cookbook) {
 			throw new BadRequestException('No such cookbook');
 		}
-		return await this.cookbookRepository.getViews(id)
+		return await this.cookbookRepository.getViews(id);
 	}
 
 	async mostPopular() {
 		return await this.cookbookRepository.mostPopular();
 	}
-
 }

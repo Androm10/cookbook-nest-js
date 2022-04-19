@@ -8,15 +8,20 @@ import { ConfigService } from '@nestjs/config';
 
 @Global()
 @Module({
-	imports: [MulterModule.registerAsync({
-		useFactory : async (configService : ConfigService) => ({
-			dest : configService.get('assetsDir') + '/user',
-			preservePath : true
+	imports: [
+		MulterModule.registerAsync({
+			useFactory: async (configService: ConfigService) => ({
+				dest: configService.get('assetsDir') + '/user',
+				preservePath: true,
+			}),
+			inject: [ConfigService],
 		}),
-		inject : [ConfigService]
-	})],
+	],
 	controllers: [UserController],
-	providers: [UserService, { provide: USER_REPOSITORY, useClass: UserRepository } ],
-	exports: [UserService, USER_REPOSITORY]
+	providers: [
+		UserService,
+		{ provide: USER_REPOSITORY, useClass: UserRepository },
+	],
+	exports: [UserService, USER_REPOSITORY],
 })
 export class UserModule {}
