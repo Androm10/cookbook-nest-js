@@ -116,6 +116,13 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 		return new Cookbook(clonedCookbook);
 	}
 
+	async getRecipes(id: number) {
+		const cookbook: any = await models.cookbook.findByPk(id);
+		const recipes: any[] = await cookbook.getRecipes();
+
+		return recipes;
+	}
+
 	async countAll() {
 		const fn = models.cookbook.sequelize.fn;
 		const col = models.cookbook.sequelize.col;
@@ -137,6 +144,32 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 			},
 		});
 		return views[0];
+	}
+
+	async getLikes(id: number) {
+		const fn = models.cookbook.sequelize.fn;
+		const col = models.cookbook.sequelize.col;
+
+		const likes = await models.cookbookLike.findAll({
+			attributes: [[fn('COUNT', col('id')), 'likes']],
+			where: {
+				cookbookId: id,
+			},
+		});
+		return likes[0];
+	}
+
+	async getCommentsCount(id: number) {
+		const fn = models.cookbook.sequelize.fn;
+		const col = models.cookbook.sequelize.col;
+
+		const comments = await models.cookbookComment.findAll({
+			attributes: [[fn('COUNT', col('id')), 'comments']],
+			where: {
+				cookbookId: id,
+			},
+		});
+		return comments[0];
 	}
 
 	async mostPopular() {

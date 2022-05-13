@@ -18,9 +18,15 @@ export interface ICookbookRepository<Cookbook> {
 
 	cloneCookbook(id: number, userId: number): Promise<Cookbook>;
 
+	getRecipes(id: number): Promise<any>;
+
 	countAll(): Promise<any>; //
 
 	getViews(id: number): Promise<any>; //
+	
+	getLikes(id: number): Promise<any>; //
+	
+	getCommentsCount(id: number): Promise<any>; //
 
 	mostPopular(): Promise<any>; //
 }

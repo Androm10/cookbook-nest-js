@@ -81,7 +81,7 @@ export class UserController {
 	}
 
 	@Get(':id/profile')
-	@Statuses('active')
+	@NoAuth()
 	async getProfile(@Param('id', ParseIntPipe) id: number) {
 		return this.userService.getProfile(id);
 	}

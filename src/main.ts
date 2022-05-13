@@ -6,7 +6,9 @@ import { APP_LOGGER } from './constants/logger';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
-	app.use(helmet());
+	app.use(helmet({
+		crossOriginResourcePolicy: false
+	}));
 	app.enableCors();
 	app.useGlobalPipes(
 		new ValidationPipe({

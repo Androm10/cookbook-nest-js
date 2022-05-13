@@ -105,6 +105,16 @@ export class CookbookService {
 		return await this.cookbookRepository.cloneCookbook(id, userId);
 	}
 
+	async getRecipes(id: number) {
+		const cookbook = await this.cookbookRepository.getById(id);
+
+		if (!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+
+		return await this.cookbookRepository.getRecipes(id);
+	}
+
 	async uploadAvatar(id: number, file: Express.Multer.File, userId: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 		if (!cookbook) {
@@ -123,7 +133,7 @@ export class CookbookService {
 		if (!cookbook) {
 			throw new NotFoundException('No such cookbook');
 		}
-		if (!cookbook.avatar) {
+		if (!cookbook.avatar || cookbook.avatar == 'none') {
 			throw new BadRequestException('Nothing to download');
 		}
 		const fileStream = createReadStream(cookbook.avatar);
@@ -141,6 +151,24 @@ export class CookbookService {
 			throw new BadRequestException('No such cookbook');
 		}
 		return await this.cookbookRepository.getViews(id);
+	}
+
+	async getLikes(id: number) {
+		const cookbook = await this.cookbookRepository.getById(id);
+
+		if (!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+		return await this.cookbookRepository.getLikes(id);
+	}
+
+	async getCommentsCount(id: number) {
+		const cookbook = await this.cookbookRepository.getById(id);
+
+		if (!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+		return await this.cookbookRepository.getCommentsCount(id);
 	}
 
 	async mostPopular() {

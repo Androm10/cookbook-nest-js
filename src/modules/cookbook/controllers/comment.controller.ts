@@ -25,13 +25,13 @@ export class CommentController {
 		return this.commentService.getById(id);
 	}
 
-	@Get('/all/:cookbookId')
+	@Get('all/:cookbookId')
 	@NoAuth()
 	async getAll(@Param('cookbookId', ParseIntPipe) cookbookId: number) {
 		return this.commentService.getAll(cookbookId);
 	}
 
-	@Post('/:cookbookId')
+	@Post(':cookbookId')
 	@Statuses('active')
 	async create(
 		@Param('cookbookId', ParseIntPipe) cookbookId: number,

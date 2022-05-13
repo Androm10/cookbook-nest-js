@@ -99,6 +99,25 @@ export class RecipeService {
 		return await this.recipeRepository.getViews(id);
 	}
 
+	async getLikes(id: number) {
+		const recipe = await this.recipeRepository.getById(id);
+
+		if (!recipe) {
+			throw new BadRequestException('No such recipe');
+		}
+		return await this.recipeRepository.getLikes(id);
+	}
+
+	async getCommentsCount(id: number) {
+		const recipe = await this.recipeRepository.getById(id);
+
+		if (!recipe) {
+			throw new BadRequestException('No such recipe');
+		}
+		return await this.recipeRepository.getCommentsCount(id);
+	}
+
+
 	async mostPopular() {
 		return await this.recipeRepository.mostPopular();
 	}

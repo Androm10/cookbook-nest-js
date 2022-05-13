@@ -92,10 +92,21 @@ export class RecipeController {
 	}
 
 	@Get('stats/:id/views')
-	@Roles('Admin')
-	@Statuses('active')
-	async getViews(@Param('id', ParseIntPipe) id: number) {
+	@NoAuth()
+	async getViews(@Param('id') id: number) {
 		return this.recipeService.getViews(id);
+	}
+
+	@Get('stats/:id/likes')
+	@NoAuth()
+	async getLikes(@Param('id') id: number) {
+		return this.recipeService.getLikes(id);
+	}
+
+	@Get('stats/:id/comments')
+	@NoAuth()
+	async getCommentsCount(@Param('id') id: number) {
+		return this.recipeService.getCommentsCount(id);
 	}
 
 	@Get('stats/mostPopular')

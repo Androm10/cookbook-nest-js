@@ -9,7 +9,6 @@ import config from './services/config';
 import { RabbitBroker } from './services/rabbitmq/broker.service';
 import { BrokerModule } from './services/rabbitmq/broker.module';
 import { LoggerModule } from './services/logger/logger.module';
-import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
 	imports: [

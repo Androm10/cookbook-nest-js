@@ -89,6 +89,13 @@ export class CookbookController {
 	async cloneCookbook(@Param('id', ParseIntPipe) id: number, @Req() req) {
 		return this.cookbookService.cloneCookbook(id, req.user.id);
 	}
+	
+	@Get(':id/recipes')
+	@NoAuth()
+	async getRecipes(@Param('id', ParseIntPipe) id: number, @Req() req) {
+		return this.cookbookService.getRecipes(id);
+	}
+
 
 	@Post(':id/uploadAvatar')
 	@Statuses('active')
@@ -103,7 +110,6 @@ export class CookbookController {
 
 	@Get(':id/avatar')
 	@NoAuth()
-	@Statuses('active')
 	async getAvatar(
 		@Param('id', ParseIntPipe) id: number,
 	): Promise<StreamableFile> {
@@ -118,10 +124,21 @@ export class CookbookController {
 	}
 
 	@Get('stats/:id/views')
-	@Roles('Admin')
-	@Statuses('active')
+	@NoAuth()
 	async getViews(@Param('id') id: number) {
 		return this.cookbookService.getViews(id);
+	}
+
+	@Get('stats/:id/likes')
+	@NoAuth()
+	async getLikes(@Param('id') id: number) {
+		return this.cookbookService.getLikes(id);
+	}
+
+	@Get('stats/:id/comments')
+	@NoAuth()
+	async getCommentsCount(@Param('id') id: number) {
+		return this.cookbookService.getCommentsCount(id);
 	}
 
 	@Get('stats/mostPopular')

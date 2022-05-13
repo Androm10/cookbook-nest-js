@@ -16,5 +16,9 @@ export interface IRecipeRepository<Recipe> {
 
 	getViews(id: number): Promise<any>; //
 
+	getLikes(id: number): Promise<any>; //
+	
+	getCommentsCount(id: number): Promise<any>; //
+
 	mostPopular(): Promise<any>; //
 }

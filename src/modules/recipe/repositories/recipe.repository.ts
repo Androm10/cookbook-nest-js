@@ -75,6 +75,32 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
 		return views[0];
 	}
 
+	async getLikes(id: number) {
+		const fn = models.recipe.sequelize.fn;
+		const col = models.recipe.sequelize.col;
+
+		const likes = await models.recipeLike.findAll({
+			attributes: [[fn('COUNT', col('id')), 'likes']],
+			where: {
+				recipeId: id,
+			},
+		});
+		return likes[0];
+	}
+
+	async getCommentsCount(id: number) {
+		const fn = models.recipe.sequelize.fn;
+		const col = models.recipe.sequelize.col;
+
+		const comments = await models.recipeComment.findAll({
+			attributes: [[fn('COUNT', col('id')), 'comments']],
+			where: {
+				recipeId: id,
+			},
+		});
+		return comments[0];
+	}
+
 	async mostPopular() {
 		const fn = models.recipe.sequelize.fn;
 		const col = models.recipe.sequelize.col;
