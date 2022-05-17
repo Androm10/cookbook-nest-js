@@ -16,8 +16,40 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 	async getAll(
 		limit: number,
 		offset: number,
+		query: any
 	): Promise<{ rows: Cookbook[]; count: number }> {
-		const found = await models.cookbook.findAndCountAll({ limit, offset });
+		
+		const literal = models.cookbook.sequelize.literal;
+		const options: any = { };
+
+		switch (query?.sort?.toLowerCase()?.trim()) {
+			case 'likes' : {
+				options.subQuery = false;
+				options.include = {
+					model: models.cookbookLike,
+					attributes: [],
+				};
+				options.order = [
+					literal('COUNT(cookbookLikes.id) DESC')
+				];
+				options.group = literal('cookbook.id');
+				break;
+			}
+			case 'popularity' : {
+				options.subQuery = false;
+               	options.include = {model: models.cookbookView, attributes : []};
+               	options.order = [
+                   literal('COUNT(cookbookViews.id) DESC')
+               	];
+				options.group = literal('cookbook.id');
+               	break;
+			}
+		}
+
+		//add tags logic
+		//add hide own logic
+
+		const found = await models.cookbook.findAndCountAll({ limit, offset, ...options });
 		return {
 			rows: found.rows.map((cookbook) => {
 				return new Cookbook(cookbook);

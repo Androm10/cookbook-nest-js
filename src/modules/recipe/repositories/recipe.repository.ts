@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { IRecipeRepository } from 'src/interfaces/repositories/IRecipeRepository';
 import { models } from 'src/services/database/sequelize';
 import { Recipe } from '../entities/recipe.entity';
@@ -16,8 +17,43 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
 	async getAll(
 		limit: number,
 		offset: number,
+		query: any
 	): Promise<{ rows: Recipe[]; count: number }> {
-		const found = await models.recipe.findAndCountAll({ limit, offset });
+
+		const literal = models.recipe.sequelize.literal;
+
+		const options: any = { };
+		switch (query?.sort?.toLowerCase()?.trim()) {
+			case 'likes' : {
+				options.subQuery = false;
+				options.include = {
+					model: models.recipeLike,
+					attributes: [],
+				};
+				options.order = [
+					literal('COUNT(recipeLikes.id) DESC')
+				];
+				options.group = literal('recipe.id');
+				break;
+			}
+			case 'popularity' : {
+				options.subQuery = false;
+               	options.include = {model: models.recipeView, attributes : []};
+               	options.order = [
+                   literal('COUNT(recipeViews.id) DESC')
+               	];
+				options.group = literal('recipe.id');
+               	break;
+			}
+		}
+		if(+query.upperBound && +query.lowerBound) {
+			options.where.cookingTime[Op.lte] = +query.upperBound;
+			options.where.cookingTime[Op.gte] = +query.lowerBound;
+		}
+		
+		//add hide own logic
+
+		const found = await models.recipe.findAndCountAll({ limit, offset, ...options});
 
 		return {
 			rows: found.rows.map((recipe) => {

@@ -4,6 +4,7 @@ export interface ICookbookRepository<Cookbook> {
 	getAll(
 		limit: number,
 		offset: number,
+		query?: any
 	): Promise<{ rows: Cookbook[]; count: number }>;
 
 	create(dto: unknown): Promise<Cookbook>;

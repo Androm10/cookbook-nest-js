@@ -26,10 +26,11 @@ export class CookbookService {
 		return cookbook;
 	}
 
-	async getAll(limit: number, page: number) {
+	async getAll(limit: number, page: number, query: any) {
 		const cookbooks = await this.cookbookRepository.getAll(
 			limit,
 			(page - 1) * limit,
+			query
 		);
 
 		return {

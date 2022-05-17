@@ -16,7 +16,6 @@ async function bootstrap() {
 			transformOptions: { enableImplicitConversion: true },
 		}),
 	);
-	app.useLogger(app.get(APP_LOGGER));
 	await app.listen(3000);
 }
 bootstrap();

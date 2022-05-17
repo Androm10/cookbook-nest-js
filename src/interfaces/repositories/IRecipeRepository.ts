@@ -4,6 +4,7 @@ export interface IRecipeRepository<Recipe> {
 	getAll(
 		limit: number,
 		offset: number,
+		query?: any
 	): Promise<{ rows: Recipe[]; count: number }>;
 
 	create(dto: unknown): Promise<Recipe>;

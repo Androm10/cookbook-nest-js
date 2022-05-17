@@ -36,8 +36,9 @@ export class RecipeController {
 	async getAll(
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('page', ParseIntPipe) page: number,
+		@Req() req
 	) {
-		return this.recipeService.getAll(limit, page);
+		return this.recipeService.getAll(limit, page, req.query);
 	}
 
 	@Post()

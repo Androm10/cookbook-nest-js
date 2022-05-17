@@ -11,7 +11,6 @@ import {
 	Query,
 	ParseIntPipe,
 	UploadedFile,
-	Header,
 	UseInterceptors,
 	StreamableFile,
 } from '@nestjs/common';
@@ -38,8 +37,9 @@ export class CookbookController {
 	async getAll(
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('page', ParseIntPipe) page: number,
+		@Req() req
 	) {
-		return this.cookbookService.getAll(limit, page);
+		return this.cookbookService.getAll(limit, page, req.query);
 	}
 
 	@Post()
