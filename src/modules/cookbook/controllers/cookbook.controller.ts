@@ -96,7 +96,6 @@ export class CookbookController {
 		return this.cookbookService.getRecipes(id);
 	}
 
-
 	@Post(':id/uploadAvatar')
 	@Statuses('active')
 	@UseInterceptors(FileInterceptor('file'))

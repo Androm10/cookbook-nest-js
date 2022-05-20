@@ -50,11 +50,18 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
 			options.where.cookingTime[Op.lte] = +query.upperBound;
 			options.where.cookingTime[Op.gte] = +query.lowerBound;
 		}
+
+		if(+query?.creatorId > 0) {
+			if(!options.where) {
+				options.where = {};
+			}
+			options.where.creatorId = +query?.creatorId;
+		}
 		
 		//add hide own logic
 
 		const found = await models.recipe.findAndCountAll({ limit, offset, ...options});
-
+		
 		return {
 			rows: found.rows.map((recipe) => {
 				return new Recipe(recipe);

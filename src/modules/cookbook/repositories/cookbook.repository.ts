@@ -49,6 +49,12 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 		//add tags logic
 		//add hide own logic
 
+		if(+query?.creatorId > 0) {
+			options.where = {
+				creatorId: +query.creatorId
+			}
+		}
+
 		const found = await models.cookbook.findAndCountAll({ limit, offset, ...options });
 		return {
 			rows: found.rows.map((cookbook) => {
