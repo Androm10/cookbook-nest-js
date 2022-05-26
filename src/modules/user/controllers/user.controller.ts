@@ -73,11 +73,16 @@ export class UserController {
 
 	@Get(':id/avatar')
 	@NoAuth()
-	@Statuses('active')
 	async getAvatar(
 		@Param('id', ParseIntPipe) id: number,
 	): Promise<StreamableFile> {
 		return this.userService.getAvatar(id);
+	}
+	
+	@Get('self/profile')
+	@Statuses('active')
+	async getSelfProfile(@Req() req) {
+		return this.userService.getProfile(req.user.id);
 	}
 
 	@Get(':id/profile')

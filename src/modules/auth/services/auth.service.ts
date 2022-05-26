@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { RMQ_BROKER } from 'src/constants/rabbitmq';
 import { RabbitBroker } from 'src/services/rabbitmq/broker.service';
 import { MAILER_QUEUE, MAIL_TYPES } from 'src/constants/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
 		private userService: UserService,
 		private jwtService: JwtService,
 		@Inject(RMQ_BROKER) private broker: RabbitBroker,
+		private configService: ConfigService
 	) {}
 
 	async validateUser(id: number) {
@@ -36,7 +38,8 @@ export class AuthService {
 		const payload = { userId: found.id };
 
 		return {
-			access_token: this.jwtService.sign(payload),
+			accessToken: this.jwtService.sign(payload),
+			expiresIn: this.configService.get<string>('auth.expiresIn')
 		};
 	}
 
