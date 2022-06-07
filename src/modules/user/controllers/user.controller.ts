@@ -25,19 +25,22 @@ import { NoAuth } from 'src/middlewares/no-auth.middleware';
 import { Statuses } from 'src/middlewares/check-status.middleware';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResetRequestDto } from '../dto/reset-request.dto';
+import { UpdateSelfDto } from '../dto/update-self.dto';
 
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get(':id')
-	@NoAuth()
+	@Roles('Admin')
+	@Statuses('active')
 	async getById(@Param('id', ParseIntPipe) id: number) {
 		return this.userService.getById(id);
 	}
 
 	@Get()
-	@NoAuth()
+	@Roles('Admin')
+	@Statuses('active')
 	async getAll(
 		@Query('limit', ParseIntPipe) limit: number,
 		@Query('page', ParseIntPipe) page: number,
@@ -79,11 +82,27 @@ export class UserController {
 		return this.userService.getAvatar(id);
 	}
 	
+	@Get('self/user')
+	@Statuses('active')
+	async getSelf(@Req() req) {
+		return this.userService.getById(req.user.id);
+	}
+
 	@Get('self/profile')
 	@Statuses('active')
 	async getSelfProfile(@Req() req) {
 		return this.userService.getProfile(req.user.id);
 	}
+
+	@Put('self/updateProfile')
+	@Statuses('active')
+	async updateSelf(
+		@Req() req,
+		@Body() updateSelfDto: UpdateSelfDto,
+	) {
+		return this.userService.updateById(req.user.id, updateSelfDto);
+	}
+
 
 	@Get(':id/profile')
 	@NoAuth()

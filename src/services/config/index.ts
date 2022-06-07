@@ -16,7 +16,7 @@ export default () => ({
 	},
 	rateLimit: {
 		ttl: 60,
-		limit: 3,
+		limit: 10,
 	},
 	assetsDir: process.env.ASSETS_DIR || path.resolve('assets'),
 	amqp: {
