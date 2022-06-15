@@ -50,6 +50,11 @@ export class UserService {
 	}
 
 	async updateById(id: number, userData: any) {
+		const existed = await this.userRepository.getByLogin(userData.login);
+		
+		if(existed && existed.id != id) 
+			throw new BadRequestException('This login has already taken');
+
 		const updated = await this.userRepository.updateById(id, userData);
 
 		if (!updated) throw new NotFoundException('No such user');
