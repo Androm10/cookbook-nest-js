@@ -96,6 +96,12 @@ export class CookbookController {
 		return this.cookbookService.getRecipes(id);
 	}
 
+	@Get(':id/card')
+	@NoAuth()
+	async getCardById(@Param('id', ParseIntPipe) id: number) {
+		return this.cookbookService.getCardById(id);
+	}
+
 	@Post(':id/uploadAvatar')
 	@Statuses('active')
 	@UseInterceptors(FileInterceptor('file'))

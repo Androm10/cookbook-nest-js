@@ -33,7 +33,7 @@ export class Recipe implements IRecipe {
 	}
 
 	validate() {
-		if (this.name.length < 3 || this.name.length > 20)
+		if (this.name.length < 3 || this.name.length > 30)
 			throw new Error('invalid name length');
 
 		if (this.creatorId < 0) throw new Error('invalid creator id');

@@ -4,6 +4,19 @@ import { models } from 'src/services/database/sequelize';
 
 @Injectable()
 export class LikeRepository implements ILikeRepository {
+
+	async isLiked(id: number, userId: number) {
+		const existed = await models.recipeLike.findOne({
+			where: {
+				userId: userId,
+				recipeId: id,
+			},
+		});
+
+		if (existed) return true;
+		return false;
+	}
+
 	async like(id: number, userId: number): Promise<boolean> {
 		const existed = await models.recipeLike.findOne({
 			where: {

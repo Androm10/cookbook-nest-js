@@ -78,7 +78,6 @@ export class RecipeController {
 
 	@Get(':id/avatar')
 	@NoAuth()
-	@Statuses('active')
 	async getAvatar(
 		@Param('id', ParseIntPipe) id: number,
 	): Promise<StreamableFile> {

@@ -8,6 +8,11 @@ export class LikeService {
 		@Inject(LIKE_REPOSITORY) private likeRepository: ILikeRepository,
 	) {}
 
+
+	async isLiked(id: number, userId: number) {
+		return this.likeRepository.isLiked(id, userId);
+	}
+
 	async like(id: number, userId: number) {
 		const created = await this.likeRepository.like(id, userId);
 

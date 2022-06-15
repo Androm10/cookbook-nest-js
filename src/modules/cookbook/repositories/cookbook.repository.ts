@@ -55,12 +55,12 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 			}
 		}
 
-		const found = await models.cookbook.findAndCountAll({ limit, offset, ...options });
+		const found = await models.cookbook.findAndCountAll({ limit, offset, ...options }) as any;
 		return {
 			rows: found.rows.map((cookbook) => {
 				return new Cookbook(cookbook);
 			}),
-			count: found.count,
+			count: found.count.length,
 		};
 	}
 

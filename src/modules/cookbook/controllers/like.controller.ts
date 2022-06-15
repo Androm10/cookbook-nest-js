@@ -13,6 +13,12 @@ import { LikeService } from '../services/like.service';
 export class LikeController {
 	constructor(private readonly likeService: LikeService) {}
 
+	@Get(':id/check')
+	@Statuses('active')
+	async isLiked(@Param('id', ParseIntPipe) id: number, @Req() req) {
+		return this.likeService.isLiked(id, req.user.id);
+	}
+
 	@Get(':id')
 	@Statuses('active')
 	async like(@Param('id', ParseIntPipe) id: number, @Req() req) {

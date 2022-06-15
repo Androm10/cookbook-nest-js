@@ -36,6 +36,11 @@ export class UserRepository implements IUserRepository<User> {
 
 		if (!user) return null;
 
+		if(userData.login) {
+			const existed = this.getByLogin(userData.login);
+			if(existed) return null;
+		}
+
 		await user.update(userData);
 
 		return new User(user);

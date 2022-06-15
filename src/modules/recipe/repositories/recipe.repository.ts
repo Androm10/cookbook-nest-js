@@ -47,6 +47,7 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
 			}
 		}
 		if(+query.upperBound && +query.lowerBound) {
+			options.where = {}; options.where.cookingTime = {};
 			options.where.cookingTime[Op.lte] = +query.upperBound;
 			options.where.cookingTime[Op.gte] = +query.lowerBound;
 		}
@@ -60,13 +61,13 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
 		
 		//add hide own logic
 
-		const found = await models.recipe.findAndCountAll({ limit, offset, ...options});
+		const found = await models.recipe.findAndCountAll({ limit, offset, ...options}) as any;
 		
 		return {
 			rows: found.rows.map((recipe) => {
 				return new Recipe(recipe);
 			}),
-			count: found.count,
+			count: found.count.length,
 		};
 	}
 

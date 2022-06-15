@@ -106,6 +106,29 @@ export class CookbookService {
 		return await this.cookbookRepository.cloneCookbook(id, userId);
 	}
 
+	async getCardById(id: number) {
+		const cookbook = await this.cookbookRepository.getById(id);
+		if (!cookbook) {
+			throw new BadRequestException('No such cookbook');
+		}
+		const views = await this.cookbookRepository.getViews(id)
+		const likes = await this.cookbookRepository.getLikes(id)
+		const comments = await this.cookbookRepository.getCommentsCount(id)
+
+		return {
+			id: cookbook.id,
+			name: cookbook.name,
+			description: cookbook.description,
+			creatorId: cookbook.creatorId,
+			views: views,
+			likes: likes,
+			comments: comments,
+			avatar: cookbook.avatar
+		};
+
+		
+	}
+
 	async getRecipes(id: number) {
 		const cookbook = await this.cookbookRepository.getById(id);
 
