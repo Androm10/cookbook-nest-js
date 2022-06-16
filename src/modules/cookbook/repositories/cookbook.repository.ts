@@ -132,6 +132,7 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 		const clonedCookbook: any = await models.cookbook.create({
 			name: cookbook.name,
 			description: cookbook.description,
+			avatar: cookbook.avatar,
 			creatorId: userId,
 		});
 

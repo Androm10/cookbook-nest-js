@@ -62,6 +62,29 @@ export class RecipeService {
 		return deleted;
 	}
 
+	async cloneRecipe(id: number, userId: number) {
+		const recipe = await this.recipeRepository.getById(id);
+
+		if (!recipe) {
+			throw new BadRequestException('No such recipe');
+		}
+		
+        let cloned = {
+            name : recipe.name,
+            description : recipe.description,
+            directions : recipe.directions,
+            ingridients : recipe.ingridients,
+            cookingTime : recipe.cookingTime,
+			avatar: recipe.avatar,
+            creatorId : userId
+        }
+
+        let result = await this.recipeRepository.create(cloned);
+
+        return result;
+
+	}
+
 	async uploadAvatar(id: number, file: Express.Multer.File, userId: number) {
 		const recipe = await this.recipeRepository.getById(id);
 		if (!recipe) {

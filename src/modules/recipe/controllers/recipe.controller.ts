@@ -12,6 +12,7 @@ import {
 	UploadedFile,
 	UseInterceptors,
 	StreamableFile,
+	Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/middlewares/check-roles.middleware';
@@ -63,6 +64,15 @@ export class RecipeController {
 	@Statuses('active')
 	async deleteById(@Param('id', ParseIntPipe) id: number) {
 		return this.recipeService.deleteById(id);
+	}
+
+	@Patch(':id')
+	@Statuses('active')
+	async cloneRecipe(
+		@Param('id', ParseIntPipe) id: number,
+		@Req() req
+	) {
+		return this.recipeService.cloneRecipe(id, req.user.id);
 	}
 
 	@Post(':id/uploadAvatar')
