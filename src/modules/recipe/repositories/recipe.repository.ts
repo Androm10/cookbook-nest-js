@@ -46,17 +46,31 @@ export class RecipeRepository implements IRecipeRepository<Recipe> {
                	break;
 			}
 		}
+		options.where = {}; 
 		if(+query.upperBound && +query.lowerBound) {
-			options.where = {}; options.where.cookingTime = {};
+			options.where.cookingTime = {};
 			options.where.cookingTime[Op.lte] = +query.upperBound;
 			options.where.cookingTime[Op.gte] = +query.lowerBound;
 		}
 
-		if(+query?.creatorId > 0) {
-			if(!options.where) {
-				options.where = {};
+		if(query?.tags as string) {
+			const descriptionOptions = {
+				description: {
+					[Op.and]: { }
+				}
+			};
+			for(const tag of query.tags?.split(',')) {
+				Object.assign(descriptionOptions.description[Op.and], {
+					[Op.like]: `%${tag}%`
+				})
 			}
-			options.where.creatorId = +query?.creatorId;
+			Object.assign(options.where, descriptionOptions);
+		}
+
+		if(+query?.creatorId > 0) {
+			Object.assign(options.where, {
+				creatorId: +query.creatorId
+			});
 		}
 		
 		//add hide own logic

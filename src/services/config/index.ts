@@ -25,7 +25,10 @@ export default () => ({
 	},
     logger: {
         queue: 'logs'
-    }
+    },
+	mongodb: {
+		connection: process.env.MONGO || '' 
+	}
 
 
 });

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { ICookbookRepository } from 'src/interfaces/repositories/ICookbookRepository';
 import { models } from 'src/services/database/sequelize';
 import { Cookbook } from '../entities/cookbook.entity';
@@ -48,11 +49,25 @@ export class CookbookRepository implements ICookbookRepository<Cookbook> {
 
 		//add tags logic
 		//add hide own logic
+		options.where = {};
+		if(query?.tags as string) {
+			const descriptionOptions = {
+				description: {
+					[Op.and]: { }
+				}
+			};
+			for(const tag of query.tags?.split(',')) {
+				Object.assign(descriptionOptions.description[Op.and], {
+					[Op.like]: `%${tag}%`
+				})
+			}
+			Object.assign(options.where, descriptionOptions);
+		}
 
 		if(+query?.creatorId > 0) {
-			options.where = {
+			Object.assign(options.where, {
 				creatorId: +query.creatorId
-			}
+			});
 		}
 
 		const found = await models.cookbook.findAndCountAll({ limit, offset, ...options }) as any;

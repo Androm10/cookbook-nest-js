@@ -9,6 +9,7 @@ import config from './services/config';
 import { RabbitBroker } from './services/rabbitmq/broker.service';
 import { BrokerModule } from './services/rabbitmq/broker.module';
 import { LoggerModule } from './services/logger/logger.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
 	imports: [
@@ -40,6 +41,12 @@ import { LoggerModule } from './services/logger/logger.module';
 			},
 			inject: [ConfigService],
 		}),
+		// MongooseModule.forRootAsync({
+		// 	useFactory: async (configService: ConfigService) => ({
+		// 		uri: configService.get<string>('mongodb.connection')	
+		// 	}),
+		// 	inject: [ConfigService]
+		// })
 	],
 	providers: [],
 	controllers: [],
