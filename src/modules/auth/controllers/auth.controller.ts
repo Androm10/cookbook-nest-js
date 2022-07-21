@@ -16,6 +16,11 @@ export class AuthController {
 		return await this.authService.logIn(loginDto);
 	}
 
+	@Post('loginAdmin')
+	async loginAdmin(@Body() loginDto: LoginDto) {
+		return await this.authService.loginAdmin(loginDto);
+	}
+
 	@Post('/signUp')
 	async signUp(@Body() signupDto: SignupDto) {
 		return await this.authService.signUp(signupDto);

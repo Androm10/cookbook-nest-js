@@ -43,6 +43,30 @@ export class AuthService {
 		};
 	}
 
+	async loginAdmin(user: any) {
+		const found = await this.userService.getByLogin(user.login);
+
+		if (found?.login != user.login) {
+			throw new BadRequestException('Login or password is incorrect');
+		}
+		if (!bcrypt.compareSync(user.password, found.password)) {
+			throw new BadRequestException('Login or password is incorrect');
+		}
+
+		const roles = await this.userService.getRoles(found.id);
+
+		if(!roles.map(role => role.name).includes('Admin')) {
+			throw new BadRequestException('Not such admin');
+		}
+
+		const payload = { userId: found.id };
+
+		return {
+			accessToken: this.jwtService.sign(payload),
+			expiresIn: this.configService.get<string>('auth.expiresIn')
+		};
+	}
+
 	async signUp(userData: any) {
 		if (await this.userService.getByLogin(userData.login)) {
 			throw new BadRequestException(
